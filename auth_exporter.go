@@ -33,7 +33,7 @@ func main() {
 		s := <-sigs
 		log.Printf("RECEIVED SIGNAL: %s", s)
 		log.Printf("Stopping : %s", filepath.Base(os.Args[0]))
-		os.Exit(1)
+		os.Exit(0)
 	}()
 
 	log.Printf("Starting %s", filepath.Base(os.Args[0]))

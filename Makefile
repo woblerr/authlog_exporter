@@ -47,7 +47,7 @@ define service-install
 	systemctl daemon-reload
 	systemctl enable $(APP_NAME)
 	systemctl restart $(APP_NAME)
-	systemctl -l status $(APP_NAME)
+	systemctl status $(APP_NAME)
 endef
 
 define service-remove

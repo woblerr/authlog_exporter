@@ -1,9 +1,7 @@
 package promexporter
 
 import (
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/hpcloud/tail"
 )
@@ -26,10 +24,6 @@ func startParserAuthlog(filePath string) {
 		ReOpen:    true,
 		MustExist: true})
 	if err != nil {
-		if os.IsPermission(err) {
-			fmt.Println("Unable to write to")
-			fmt.Println(err)
-		}
 		log.Fatal(err)
 	}
 	for line := range t.Lines {

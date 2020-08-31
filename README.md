@@ -85,28 +85,34 @@ make run-test
 
 ### Running as systemd service
 
-Register `auth_exporter` (already builded, if not - exec `make build` before) as a systemd service:
+* Register `auth_exporter` (already builded, if not - exec `make build` before) as a systemd service:
 
 ```bash
 cd ${GOPATH-$HOME/go}/src/github.com/woblerr/prom_authlog_exporter
 make prepare-service
 ```
 
-Validate prepared file `auth_exporter.service` and run
+Validate prepared file `auth_exporter.service` and run:
 
 ```bash
-sudo install-service
+sudo make install-service
 ```
 
-Delete systemd service:
+* View service logs:
+
+```bash
+journalctl -u auth_exporter.service
+```
+
+* Delete systemd service:
 
 ```bash
 cd ${GOPATH-$HOME/go}/src/github.com/woblerr/prom_authlog_exporter
-sudo remove-service
+sudo make remove-service
 ```
 
 ---
-For manual register systemd service
+Manual register systemd service:
 
 ```bash
 cd ${GOPATH-$HOME/go}/src/github.com/woblerr/prom_authlog_exporter
