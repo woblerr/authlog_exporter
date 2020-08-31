@@ -1,0 +1,14 @@
+[Unit]
+Description=auth_exporter
+
+[Service]
+Type=simple
+Environment="AUTH_LOG_PATH=/var/log/auth.log"
+Environment="ENDPOINT=/metrics"
+Environment="PORT=9991"
+ExecStart={PATH_TO_FILE}/auth_exporter -auth.log ${AUTH_LOG_PATH} -endpoint ${ENDPOINT} -port ${PORT}
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target 

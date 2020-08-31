@@ -1,0 +1,14 @@
+language: go
+go: 
+  - tip # The latest version of Go.
+
+install:
+   - go get golang.org/x/tools/cmd/cover
+   - go get github.com/mattn/goveralls
+
+script:
+ - make build
+
+after_success:
+ - go test ./... -covermode=count -coverprofile=coverage.out
+ - $(go env GOPATH | awk 'BEGIN{FS=":"} {print $1}')/bin/goveralls -coverprofile=coverage.out -service=travis-ci

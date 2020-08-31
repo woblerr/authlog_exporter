@@ -1,0 +1,65 @@
+Aug 30 12:02:00 hostname sshd[17915]: Did not receive identification string from 12.123.12.123 port 5688
+Aug 30 12:02:00 hostname sshd[17916]: Invalid user support from 12.123.12.123 port 6280
+Aug 30 12:02:00 hostname sshd[17917]: User root from 12.123.12.123 not allowed because not listed in AllowUsers
+Aug 30 12:02:00 hostname sshd[17917]: Connection closed by invalid user root 12.123.12.123 port 6270 [preauth]
+Aug 30 12:02:00 hostname sshd[17916]: Connection closed by invalid user support 12.123.12.123 port 6280 [preauth]
+Aug 30 12:06:31 hostname sshd[19746]: User root from 12.123.123.1 not allowed because not listed in AllowUsers
+Aug 30 12:06:31 hostname sshd[19746]: Received disconnect from 12.123.123.1 port 51294:11: Bye Bye [preauth]
+Aug 30 12:06:31 hostname sshd[19746]: Disconnected from invalid user root 12.123.123.1 port 51294 [preauth]
+Aug 30 12:10:15 hostname sshd[21248]: Did not receive identification string from 12.123.123.1 port 2546
+Aug 30 12:10:17 hostname sshd[21250]: User root from 12.123.123.1 not allowed because not listed in AllowUsers
+Aug 30 12:10:18 hostname sshd[21250]: Connection closed by invalid user root 12.123.123.1 port 2166 [preauth]
+Aug 30 12:10:18 hostname sshd[21249]: User root from 12.123.123.1 not allowed because not listed in AllowUsers
+Aug 30 12:10:19 hostname sshd[21249]: Connection closed by invalid user root 12.123.123.1 port 1984 [preauth]
+Aug 30 12:16:51 hostname sshd[23818]: User root from 12.123.123.1 not allowed because not listed in AllowUsers
+Aug 30 12:16:52 hostname sshd[23818]: Received disconnect from 12.123.123.1 port 48589:11: Bye Bye [preauth]
+Aug 30 12:16:52 hostname sshd[23818]: Disconnected from invalid user root 12.123.123.1 port 48589 [preauth]
+Aug 30 12:17:01 hostname CRON[23891]: pam_unix(cron:session): session opened for user root by (uid=0)
+Aug 30 12:17:01 hostname CRON[23891]: pam_unix(cron:session): session closed for user root
+Aug 30 12:17:33 hostname sshd[24084]: User root from 12.123.123.1 not allowed because not listed in AllowUsers
+Aug 30 12:17:34 hostname sshd[24084]: Received disconnect from 12.123.123.1 port 52452:11: Bye Bye [preauth]
+Aug 30 12:17:34 hostname sshd[24084]: Disconnected from invalid user root 12.123.123.1 port 52452 [preauth]
+Aug 30 12:21:55 hostname sshd[25777]: Invalid user postgres from 123.123.123.123 port 50134
+Aug 30 12:21:55 hostname sshd[25777]: Received disconnect from 123.123.123.123 port 50134:11: Bye Bye [preauth]
+Aug 30 12:21:55 hostname sshd[25777]: Disconnected from invalid user postgres 123.123.123.123 port 50134 [preauth]
+Aug 30 12:26:52 hostname sshd[27714]: Invalid user bp from 123.123.123.123 port 38446
+Aug 30 12:26:52 hostname sshd[27714]: Received disconnect from 123.123.123.123 port 38446:11: Bye Bye [preauth]
+Aug 30 12:26:52 hostname sshd[27714]: Disconnected from invalid user bp 123.123.123.123 port 38446 [preauth]
+Aug 30 12:27:07 hostname sshd[27827]: Connection closed by 123.123.123.123 port 48554 [preauth]
+Aug 30 12:27:52 hostname sshd[28114]: User root from 123.123.123.123 not allowed because not listed in AllowUsers
+Aug 30 12:27:52 hostname sshd[28114]: Received disconnect from 123.123.123.123 port 48706:11: Bye Bye [preauth]
+Aug 30 12:27:52 hostname sshd[28114]: Disconnected from invalid user root 123.123.123.123 port 48706 [preauth]
+Aug 30 13:13:43 hostname sshd[13432]: Invalid user angelo from 123.123.123.123 port 46838
+Aug 30 13:13:43 hostname sshd[13432]: Received disconnect from 123.123.123.123 port 46838:11: Bye Bye [preauth]
+Aug 30 13:13:43 hostname sshd[13432]: Disconnected from invalid user angelo 123.123.123.123 port 46838 [preauth]
+Aug 30 13:17:01 hostname CRON[14756]: pam_unix(cron:session): session opened for user root by (uid=0)
+Aug 30 13:17:01 hostname CRON[14756]: pam_unix(cron:session): session closed for user root
+Aug 30 13:50:45 hostname sshd[27998]: Accepted publickey for testuser from 123.123.12.12 port 45768 ssh2: RSA SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Aug 30 13:50:45 hostname sshd[27998]: pam_unix(sshd:session): session opened for user testuser by (uid=0)
+Aug 30 13:50:45 hostname systemd: pam_unix(systemd-user:session): session opened for user testuser by (uid=0)
+Aug 30 13:50:45 hostname systemd-logind[807]: New session 136 of user testuser.
+Aug 30 13:50:57 hostname sudo:    testuser : TTY=pts/0 ; PWD=/home/testuser ; USER=root ; COMMAND=/bin/su
+Aug 30 13:50:57 hostname sudo: pam_unix(sudo:session): session opened for user root by testuser(uid=0)
+Aug 30 13:50:57 hostname su[28217]: Successful su for root by root
+Aug 30 13:50:57 hostname su[28217]: + /dev/pts/0 root:root
+Aug 30 13:50:57 hostname su[28217]: pam_unix(su:session): session opened for user root by testuser(uid=0)
+Aug 30 13:50:57 hostname su[28217]: pam_systemd(su:session): Cannot create session: Already running in a session
+Aug 30 13:50:59 hostname su[28217]: pam_unix(su:session): session closed for user root
+Aug 30 13:50:59 hostname sudo: pam_unix(sudo:session): session closed for user root
+Aug 30 13:51:10 hostname sudo:    testuser : TTY=pts/0 ; PWD=/home/testuser ; USER=root ; COMMAND=/bin/ls -la
+Aug 30 13:51:10 hostname sudo: pam_unix(sudo:session): session opened for user root by testuser(uid=0)
+Aug 30 13:51:10 hostname sudo: pam_unix(sudo:session): session closed for user root
+Aug 30 13:51:46 hostname sshd[28122]: Disconnected from user testuser 123.123.12.12 port 45768
+Aug 30 13:51:46 hostname sshd[27998]: pam_unix(sshd:session): session closed for user testuser
+Aug 30 13:51:46 hostname systemd-logind[807]: Removed session 136.
+Aug 30 13:56:13 hostname sshd[30389]: Accepted publickey for testuser from 123.123.12.12 port 45784 ssh2: RSA SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Aug 30 13:56:13 hostname sshd[30389]: pam_unix(sshd:session): session opened for user testuser by (uid=0)
+Aug 30 13:56:13 hostname systemd-logind[807]: New session 140 of user testuser.
+Aug 30 13:56:13 hostname systemd: pam_unix(systemd-user:session): session opened for user testuser by (uid=0)
+Aug 30 13:56:16 hostname sshd[30485]: Received disconnect from 123.123.12.12 port 45784:11: disconnected by user
+Aug 30 13:56:16 hostname sshd[30485]: Disconnected from user testuser 123.123.12.12 port 45784
+Aug 30 15:10:35 hostname sshd[27472]: Connection closed by authenticating user testuser 123.123.12.12 port 46764 [preauth]
+Aug 30 15:11:35 hostname sshd[11944]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=123.123.12.123  user=root
+Aug 30 15:11:36 hostname sshd[11944]: Failed password for invalid user root from 123.123.12.12 port 46680 ssh2
+Apr 30 15:25:05 hostname sshd[11947]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=123.123.12.123  user=root
+Apr 30 15:25:06 hostname sshd[11947]: Failed password for root from 123.123.12.123 port 35449 ssh2
