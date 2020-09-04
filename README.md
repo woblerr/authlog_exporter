@@ -130,3 +130,37 @@ systemctl -l status auth_exporter.service
 ```
 
 ---
+
+### Running as docker container
+
+Be aware that user who runs docker container should have read permission to file `/var/log/auth.log`. Otherwise, the container won't start.
+
+* Build container:
+
+```bash
+make docker-build
+```
+
+or manual:
+
+```bash
+docker build -t auth_exporter .
+```
+
+* Run container
+
+```bash
+make docker-run
+```
+
+or manual:
+
+```bash
+docker run -d --restart=always \
+  --name auth_exporter \
+  -p 9991:9991 \
+  -v /var/log/auth.log:/log/auth.log:ro \
+  -u $(id -u):$(id -g) \
+  auth_exporter \
+  -auth.log /log/auth.log
+```
