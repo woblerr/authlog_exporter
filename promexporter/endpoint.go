@@ -12,7 +12,7 @@ var (
 	promEndpoint = "/metrics"
 )
 
-// SetPromPortandPath sets HTTP endpoint parameters from command line agruments 'port' and 'endpoint'
+// SetPromPortandPath sets HTTP endpoint parameters from command line arguments 'port' and 'endpoint'
 func SetPromPortandPath(port, endpoint string) {
 	promPort = port
 	promEndpoint = endpoint

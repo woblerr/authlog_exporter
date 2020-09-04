@@ -1,5 +1,5 @@
 APP_NAME = auth_exporter
-SERVICE_CONF_DIR = /etc/systemd/system/
+SERVICE_CONF_DIR = /etc/systemd/system
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 all: run-test
@@ -53,7 +53,7 @@ endef
 define service-remove
 	systemctl stop $(APP_NAME)
 	systemctl disable $(APP_NAME)
-	rm $(SERVICE_CONF_DIR)$(APP_NAME).service
+	rm $(SERVICE_CONF_DIR)/$(APP_NAME).service
 	systemctl daemon-reload
 	systemctl reset-failed
 endef
