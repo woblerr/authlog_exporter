@@ -15,6 +15,7 @@ var (
 	promPort    = flag.String("port", "9991", "Port for prometheus metrics to listen on")
 	promPath    = flag.String("endpoint", "/metrics", "Endpoint used for metrics")
 	authlogPath = flag.String("auth.log", "/var/log/auth.log", "Path to auth.log")
+	version     = "development"
 )
 
 func main() {
@@ -37,6 +38,7 @@ func main() {
 	}()
 
 	log.Printf("Starting %s", filepath.Base(os.Args[0]))
+	log.Printf("Version: %s", version)
 
 	// Setup parameters for exporter
 	promexporter.SetPromPortandPath(*promPort, *promPath)

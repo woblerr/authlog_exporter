@@ -4,7 +4,7 @@ COPY . .
 RUN apk update \
     && apk add git \
     && go get -d -v ./... \
-    && CGO_ENABLED=0 GOOS=linux go build -o auth_exporter auth_exporter.go
+    && CGO_ENABLED=0 GOOS=linux go build -trimpath -o auth_exporter auth_exporter.go
 
 
 FROM scratch

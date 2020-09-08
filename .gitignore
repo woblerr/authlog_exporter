@@ -9,6 +9,8 @@
 /auth_exporter
 /auth_exporter.service
 
+/dist
+
 # Test binary, built with `go test -c`
 *.test
 

@@ -9,13 +9,14 @@ all: run-test docker-run-test
 test:
 	@echo "Run tests for $(APP_NAME)"
 	go get -v ./...
-	go test -v ./...
+	go get golang.org/x/tools/cmd/cover
+	go test -v ./... -covermode=count -coverprofile=coverage.out
 
 .PHONY: build
 build:
 	@echo "Build $(APP_NAME)"
 	@make test
-	CGO_ENABLED=0 GOOS=linux go build -o $(APP_NAME) $(APP_NAME).go
+	CGO_ENABLED=0 GOOS=linux go build -trimpath -o $(APP_NAME) $(APP_NAME).go
 	./$(APP_NAME) -h
 
 .PHONY: run-test
