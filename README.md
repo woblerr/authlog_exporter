@@ -55,7 +55,7 @@ make build
 ./auth_exporter <flags>
 ```
 
-By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9090/metrics. This means that the user who runs `auth_exporter` should have read permission to file `/var/log/auth.log`. You can changed logfile location, port and endpoint by using the`-auth.log`, `-port` and `-endpoint` flags.
+By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9090/metrics. This means that the user who runs `auth_exporter` should have read permission to file `/var/log/auth.log`. You can changed logfile location, port and endpoint by using the`-auth.log`, `-prom.port` and `-prom.endpoint` flags.
 
 Available configuration flags:
 
@@ -65,9 +65,13 @@ Available configuration flags:
 Usage of ./auth_exporter:
   -auth.log string
         Path to auth.log (default "/var/log/auth.log")
-  -endpoint string
+  -geo.db string
+        Path to geoIP database file
+  -geo.lang string
+        Output language format (default "en")
+  -prom.endpoint string
         Endpoint used for metrics (default "/metrics")
-  -port string
+  -prom.port string
         Port for prometheus metrics to listen on (default "9991")
 ```
 

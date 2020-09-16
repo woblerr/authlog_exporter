@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test_getMatches(t *testing.T) {
+func TestGetMatches(t *testing.T) {
 	type args struct {
 		line string
 		re   *regexp.Regexp
@@ -113,11 +113,10 @@ func Test_getMatches(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getMatches(tt.args.line, tt.args.re); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getMatches() = %v, want %v", got, tt.want)
+				t.Errorf("\ngetMatches():\n%v,\nwant:\n%v", got, tt.want)
 			}
 		})
 	}

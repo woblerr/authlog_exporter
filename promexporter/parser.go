@@ -9,8 +9,7 @@ import (
 )
 
 var (
-	authLinePrefix = "^(?P<date>[A-Z][a-z]{2}\\s+\\d{1,2}) (?P<time>(\\d{2}:?){3}) (?P<host>[a-zA-Z0-9_\\-\\.]+) (?P<ident>[a-zA-Z0-9_\\-]+)(\\[(?P<pid>\\d+)\\])?: "
-
+	authLinePrefix  = "^(?P<date>[A-Z][a-z]{2}\\s+\\d{1,2}) (?P<time>(\\d{2}:?){3}) (?P<host>[a-zA-Z0-9_\\-\\.]+) (?P<ident>[a-zA-Z0-9_\\-]+)(\\[(?P<pid>\\d+)\\])?: "
 	authLineRegexps = map[string]*regexp.Regexp{
 		"authAccepted":     regexp.MustCompile(authLinePrefix + "Accepted (password|publickey) for (?P<user>.*) from (?P<ipAddress>.*) port"),
 		"authFailed":       regexp.MustCompile(authLinePrefix + "Failed (password|publickey) for (invalid user )?(?P<user>.*) from (?P<ipAddress>.*) port"),
@@ -22,7 +21,7 @@ var (
 		Name: "auth_exporter_auth_events",
 		Help: "The total number of auth events by user and IP addresses",
 	},
-		[]string{"eventType", "user", "ipAddress"})
+		[]string{"eventType", "user", "ipAddress", "countyISOCode", "countryName", "cityName"})
 )
 
 type authLogLine struct {
@@ -33,15 +32,12 @@ type authLogLine struct {
 
 func parseLine(line *tail.Line) {
 	parsedLog := &authLogLine{}
-
 	matches := make(map[string]string)
-
 	// Find the type of log and parse it
 	for t, re := range authLineRegexps {
 		if re.MatchString(line.Text) {
 			parsedLog.Type = t
 			matches = getMatches(line.Text, re)
-			//fmt.Println(matches)
 			continue
 		}
 	}
@@ -49,16 +45,31 @@ func parseLine(line *tail.Line) {
 	if len(matches) == 0 {
 		return
 	}
+	geoIPData := &geoInfo{}
 	parsedLog.Username = matches["user"]
 	parsedLog.IPAddress = matches["ipAddress"]
+	// Get geo information
+	if geodbIs {
+		if geodbType == "db" {
+			getIPDetailsFromLocalDB(geoIPData, parsedLog.IPAddress)
+		} else {
+			getIPDetailsFromURL(geoIPData, parsedLog.IPAddress)
+		}
+	}
 	// Add metric
-	authVentsMetric.WithLabelValues(parsedLog.Type, parsedLog.Username, parsedLog.IPAddress).Inc()
+	authVentsMetric.WithLabelValues(
+		parsedLog.Type,
+		parsedLog.Username,
+		parsedLog.IPAddress,
+		geoIPData.countyISOCode,
+		geoIPData.countryName,
+		geoIPData.cityName,
+	).Inc()
 }
 
 func getMatches(line string, re *regexp.Regexp) map[string]string {
 	matches := re.FindStringSubmatch(line)
 	results := make(map[string]string)
-
 	// Get the basic information out of the log
 	for i, name := range re.SubexpNames() {
 		if i != 0 && len(matches) > i {

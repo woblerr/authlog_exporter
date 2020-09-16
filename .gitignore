@@ -5,11 +5,18 @@
 *.so
 *.dylib
 *.html
+*.zip
+*.tar
+*.tar.gz
 
 /auth_exporter
 /auth_exporter.service
 
+/GeoLite*
+
 /dist
+
+/.vscode
 
 # Test binary, built with `go test -c`
 *.test

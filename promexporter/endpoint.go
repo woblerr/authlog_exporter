@@ -8,20 +8,18 @@ import (
 )
 
 var (
-	promPort     = "9991"
-	promEndpoint = "/metrics"
+	promPort     string
+	promEndpoint string
 )
 
 // SetPromPortandPath sets HTTP endpoint parameters from command line arguments 'port' and 'endpoint'
 func SetPromPortandPath(port, endpoint string) {
 	promPort = port
 	promEndpoint = endpoint
+	log.Printf("Use port %s and HTTP endpoint %s", promPort, promEndpoint)
 }
 
 func startPromEndpoint() {
-
-	log.Printf("Use port: %s and HTTP endpoint: %s", promPort, promEndpoint)
-
 	go func() {
 		http.Handle(promEndpoint, promhttp.Handler())
 		log.Fatalln(http.ListenAndServe(":"+promPort, nil))
