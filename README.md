@@ -6,7 +6,7 @@ Prometheus exporter for collecting metrics from linux `auth.log` file.
 
 ## Collected metrics
 
-The client provides a metric `auth_exporter_auth_events` which contains the number of auth events group by `event type`, `user` and `ip address`.
+The client provides a metric `auth_exporter_auth_events` which contains the number of auth events group by `event type`, `user` and `ip address`. Client also could analyze the location of IP addresses found in `auth.log` if geoIP database is specified.
 
 ### Metric description
 
@@ -15,14 +15,27 @@ The client provides a metric `auth_exporter_auth_events` which contains the numb
 ```
 # HELP auth_exporter_auth_events The total number of auth events by user and IP addresses
 # TYPE auth_exporter_auth_events counter
-auth_exporter_auth_events{eventType="authAccepted",ipAddress="123.123.12.12",user="testuser"} 2
-auth_exporter_auth_events{eventType="authFailed",ipAddress="123.123.12.12",user="root"} 1
-auth_exporter_auth_events{eventType="authFailed",ipAddress="123.123.12.123",user="root"} 1
-auth_exporter_auth_events{eventType="connectionClosed",ipAddress="123.123.12.12",user="testuser"} 1
-auth_exporter_auth_events{eventType="invalidUser",ipAddress="12.123.12.123",user="support"} 1
-auth_exporter_auth_events{eventType="invalidUser",ipAddress="123.123.123.123",user="postgres"} 1
-auth_exporter_auth_events{eventType="notAllowedUser",ipAddress="12.123.123.1",user="root"} 5
-auth_exporter_auth_events{eventType="notAllowedUser",ipAddress="123.123.123.123",user="root"} 1
+auth_exporter_auth_events{cityName="",countryName="",countyISOCode="",eventType="invalidUser",ipAddress="12.123.12.123",user="support"} 1
+auth_exporter_auth_events{cityName="",countryName="",countyISOCode="",eventType="notAllowedUser",ipAddress="12.123.12.123",user="root"} 1
+auth_exporter_auth_events{cityName="",countryName="",countyISOCode="",eventType="notAllowedUser",ipAddress="12.123.123.1",user="root"} 5
+auth_exporter_auth_events{cityName="",countryName="",countyISOCode="",eventType="authAccepted",ipAddress="123.123.12.12",user="testuser"} 2
+auth_exporter_auth_events{cityName="",countryName="",countyISOCode="",eventType="authFailed",ipAddress="123.123.12.12",user="root"} 1
+auth_exporter_auth_events{cityName="",countryName="",countyISOCode="",eventType="authFailed",ipAddress="123.123.12.123",user="root"} 1
+auth_exporter_auth_events{cityName="",countryName="",countyISOCode="",eventType="connectionClosed",ipAddress="123.123.12.12",user="testuser"} 1
+```
+
+If geoIP database is specified:
+
+```
+# HELP auth_exporter_auth_events The total number of auth events by user and IP addresses
+# TYPE auth_exporter_auth_events counter
+auth_exporter_auth_events{cityName="",countryName="United States",countyISOCode="US",eventType="invalidUser",ipAddress="12.123.12.123",user="support"} 1
+auth_exporter_auth_events{cityName="",countryName="United States",countyISOCode="US",eventType="notAllowedUser",ipAddress="12.123.12.123",user="root"} 1
+auth_exporter_auth_events{cityName="",countryName="United States",countyISOCode="US",eventType="notAllowedUser",ipAddress="12.123.123.1",user="root"} 5
+auth_exporter_auth_events{cityName="Beijing",countryName="China",countyISOCode="CN",eventType="authAccepted",ipAddress="123.123.12.12",user="testuser"} 2
+auth_exporter_auth_events{cityName="Beijing",countryName="China",countyISOCode="CN",eventType="authFailed",ipAddress="123.123.12.12",user="root"} 1
+auth_exporter_auth_events{cityName="Beijing",countryName="China",countyISOCode="CN",eventType="authFailed",ipAddress="123.123.12.123",user="root"} 1
+auth_exporter_auth_events{cityName="Beijing",countryName="China",countyISOCode="CN",eventType="connectionClosed",ipAddress="123.123.12.12",user="testuser"} 1
 ```
 
 **Prefix regexp:**
@@ -57,6 +70,12 @@ make build
 
 By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9090/metrics. This means that the user who runs `auth_exporter` should have read permission to file `/var/log/auth.log`. You can changed logfile location, port and endpoint by using the`-auth.log`, `-prom.port` and `-prom.endpoint` flags.
 
+For geoIP analyze you need to specify `-geo.type` flag:
+* `db` - for local geoIP database file,
+* `url` - for geoIP database API. 
+
+For local geoIP database usage you also need specify `-geo.db` flag (path to geoIP database file).
+
 Available configuration flags:
 
 ```bash
@@ -69,11 +88,47 @@ Usage of ./auth_exporter:
         Path to geoIP database file
   -geo.lang string
         Output language format (default "en")
+  -geo.type string
+        Type of geoIP database: db, url
+  -geo.url string
+        URL for geoIP database API (default "https://freegeoip.live/json/")
   -prom.endpoint string
         Endpoint used for metrics (default "/metrics")
   -prom.port string
         Port for prometheus metrics to listen on (default "9991")
 ```
+
+### geoIP
+
+#### Local geoIP database
+
+To analyze IP addresses location found in the log from local geoIP database you need to free download: [GeoLite2-City](https://dev.maxmind.com/geoip/geoip2/geolite2/).
+
+The library [geoip2-golang](https://github.com/oschwald/geoip2-golang) is used for reading the GeoLite2 database.
+
+```bash
+./auth_exporter -geo.type db -geo.db /path/to/GeoLite2-City.mmdb
+```
+
+Уou can specify output language (`en` by default):
+
+```bash
+./auth_exporter -geo.type db -geo.db /path/to/GeoLite2-City.mmdb -geo.lang ru
+```
+
+Metric example:
+
+`auth_exporter_auth_events{cityName="Пекин",countryName="Китай",countyISOCode="CN",eventType="authAccepted",ipAddress="123.123.12.12",user="testuser"} 2`
+
+#### geoIP database API
+
+To analyze IP addresses location using external API https://freegeoip.live:
+
+```bash
+./auth_exporter -geo.type url
+```
+
+Be aware that API has a limit of **10K requests per hour**.
 
 ### Running tests
 
