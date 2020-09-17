@@ -72,7 +72,7 @@ By default, metrics will be collecting from `/var/log/auth.log` and will be avai
 
 For geoIP analyze you need to specify `-geo.type` flag:
 * `db` - for local geoIP database file,
-* `url` - for geoIP database API. 
+* `url` - for geoIP database API.
 
 For local geoIP database usage you also need specify `-geo.db` flag (path to geoIP database file).
 
@@ -110,7 +110,7 @@ The library [geoip2-golang](https://github.com/oschwald/geoip2-golang) is used f
 ./auth_exporter -geo.type db -geo.db /path/to/GeoLite2-City.mmdb
 ```
 
-Уou can specify output language (`en` by default):
+Уou can specify output language (default `en`):
 
 ```bash
 ./auth_exporter -geo.type db -geo.db /path/to/GeoLite2-City.mmdb -geo.lang ru
@@ -118,7 +118,9 @@ The library [geoip2-golang](https://github.com/oschwald/geoip2-golang) is used f
 
 Metric example:
 
-`auth_exporter_auth_events{cityName="Пекин",countryName="Китай",countyISOCode="CN",eventType="authAccepted",ipAddress="123.123.12.12",user="testuser"} 2`
+```
+auth_exporter_auth_events{cityName="Пекин",countryName="Китай",countyISOCode="CN",eventType="authAccepted",ipAddress="123.123.12.12",user="testuser"} 2
+```
 
 #### geoIP database API
 
