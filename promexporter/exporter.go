@@ -7,18 +7,16 @@ import (
 )
 
 var (
-	authlogPath = "/var/log/auth.log"
+	authlogPath string
 )
 
 // SetAuthlogPath sets path for 'auth.log' from command line argument 'auth.log'
 func SetAuthlogPath(filePath string) {
 	authlogPath = filePath
+	log.Printf("Log for parsing %s", authlogPath)
 }
 
 func startParserAuthlog(filePath string) {
-
-	log.Printf("Log for parsing: %s", authlogPath)
-
 	t, err := tail.TailFile(filePath, tail.Config{
 		Follow:    true,
 		ReOpen:    true,
@@ -29,7 +27,6 @@ func startParserAuthlog(filePath string) {
 	for line := range t.Lines {
 		parseLine(line)
 	}
-
 }
 
 // Start runs promhttp endpoind and parsing log process

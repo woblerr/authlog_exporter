@@ -9,8 +9,7 @@ func TestSetAuthlogPath(t *testing.T) {
 		testLog = "/test_log/auth.log"
 	)
 	SetAuthlogPath(testLog)
-
 	if testLog != authlogPath {
-		t.Errorf("Variables do not match: %s, want: %s", testLog, authlogPath)
+		t.Errorf("Variables do not match: %s,\nwant: %s", testLog, authlogPath)
 	}
 }

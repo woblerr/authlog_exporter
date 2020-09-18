@@ -10,8 +10,7 @@ func TestSetPromPortandPath(t *testing.T) {
 		testEndpoit = "/metrics"
 	)
 	SetPromPortandPath(testPort, testEndpoit)
-
 	if testPort != promPort || testEndpoit != promEndpoint {
-		t.Errorf("Variables do not match: %s, want: %s; %s, want: %s", testPort, promPort, testEndpoit, promEndpoint)
+		t.Errorf("\nVariables do not match: %s,\nwant: %s;\nendpoint: %s,\nwant: %s", testPort, promPort, testEndpoit, promEndpoint)
 	}
 }
