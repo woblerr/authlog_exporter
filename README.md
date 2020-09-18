@@ -1,6 +1,7 @@
 # prom_authlog_exporter
 
 [![Build Status](https://travis-ci.com/woblerr/prom_authlog_exporter.svg?branch=master)](https://travis-ci.com/woblerr/prom_authlog_exporter)
+[![Go Report Card](https://goreportcard.com/badge/github.com/woblerr/prom_authlog_exporter)](https://goreportcard.com/report/github.com/woblerr/prom_authlog_exporter)
 
 Prometheus exporter for collecting metrics from linux `auth.log` file.
 

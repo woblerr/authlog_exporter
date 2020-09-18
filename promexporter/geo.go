@@ -50,7 +50,7 @@ func checkGeoDBFlags() {
 		geodbIs = true
 		log.Println("Use GeoIp database url", geoURL)
 	default:
-		log.Println("Error geo.type flag value is incorect", geodbType)
+		log.Println("Error geo.type flag value is incorrect", geodbType)
 		log.Println(notSetLogMsg)
 	}
 }

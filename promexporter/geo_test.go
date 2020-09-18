@@ -38,7 +38,7 @@ func TestSetGeodbPath(t *testing.T) {
 		},
 		{"badGeodbType",
 			args{"test", "", "", ""},
-			"Error geo.type flag value is incorect",
+			"Error geo.type flag value is incorrect",
 		},
 	}
 	for _, tt := range tests {
