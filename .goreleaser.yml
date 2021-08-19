@@ -6,21 +6,32 @@ builds:
       - CGO_ENABLED=0
     goos: 
       - linux
+      - darwin
     goarch:
-      - 386
       - amd64
-    flags: "-trimpath"
+      - arm64
+    flags: 
+      - -trimpath
+      - -mod=vendor
     ldflags: "-s -w -X main.version={{ .Version }}"
     main: .
 
 archives:
-  - id: auth_exporter
+  - id: pgbackrest_exporter
     files:
       - LICENSE
     format: tar.gz
     name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
     wrap_in_directory: true
+    replacements:
+      amd64: x86_64
+      darwin: macos
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
 
+release:
+  draft: true
+
+changelog:
+  skip: true
