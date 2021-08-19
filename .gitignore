@@ -9,13 +9,19 @@
 *.tar
 *.tar.gz
 
+# Binary file
 /auth_exporter
+
+# Service file
 /auth_exporter.service
 
+# Geo
 /GeoLite*
 
+# Release dir
 /dist
 
+# VSCode
 /.vscode
 
 # Test binary, built with `go test -c`

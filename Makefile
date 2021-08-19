@@ -25,6 +25,15 @@ build-darwin:
 	@make test
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -mod=vendor -trimpath -ldflags "-X main.version=$(BRANCH)-$(GIT_REV)" -o $(APP_NAME) $(APP_NAME).go
 
+.PHONY: dist
+dist:
+	- @mkdir -p dist
+	docker build -f Dockerfile.artifacts --progress=plain -t $(APP_NAME)_dist .
+	- @docker rm -f $(APP_NAME)_dist 2>/dev/null || exit 0
+	docker run -d --name=$(APP_NAME)_dist $(APP_NAME)_dist
+	docker cp $(APP_NAME)_dist:/artifacts dist/
+	docker rm -f $(APP_NAME)_dist
+
 .PHONY: run-test
 run-test:
 	@echo "Run $(APP_NAME) for test log: ./test/auth.log"
