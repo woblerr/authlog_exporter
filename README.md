@@ -1,6 +1,7 @@
 # prom_authlog_exporter
 
-[![Build Status](https://travis-ci.com/woblerr/prom_authlog_exporter.svg?branch=master)](https://travis-ci.com/woblerr/prom_authlog_exporter)
+[![Actions Status](https://github.com/woblerr/prom_authlog_exporter/workflows/build/badge.svg)](https://github.com/woblerr/prom_authlog_exporter/actions)
+[![Coverage Status](https://coveralls.io/repos/github/woblerr/prom_authlog_exporter/badge.svg?branch=master)](https://coveralls.io/github/woblerr/prom_authlog_exporter?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/woblerr/prom_authlog_exporter)](https://goreportcard.com/report/github.com/woblerr/prom_authlog_exporter)
 
 Prometheus exporter for collecting metrics from linux `auth.log` file.
@@ -58,45 +59,38 @@ auth_exporter_auth_events{cityName="Beijing",countryName="China",countyISOCode="
 
 ### Building and running
 
-Requirement:
-
-* [Go compiler](https://golang.org/dl/)
-
 ```bash
-go get github.com/woblerr/prom_authlog_exporter
-cd ${GOPATH-$HOME/go}/src/github.com/woblerr/prom_authlog_exporter
+git clone https://github.com/woblerr/prom_authlog_exporter.git
+cd prom_authlog_exporter
 make build
 ./auth_exporter <flags>
 ```
 
-By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9090/metrics. This means that the user who runs `auth_exporter` should have read permission to file `/var/log/auth.log`. You can changed logfile location, port and endpoint by using the`-auth.log`, `-prom.port` and `-prom.endpoint` flags.
+By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9090/metrics. This means that the user who runs `auth_exporter` should have read permission to file `/var/log/auth.log`. You can changed logfile location, port and endpoint by using the`--auth.log`, `--prom.port` and `--prom.endpoint` flags.
 
-For geoIP analyze you need to specify `-geo.type` flag:
+For geoIP analyze you need to specify `--geo.type` flag:
 * `db` - for local geoIP database file,
 * `url` - for geoIP database API.
 
-For local geoIP database usage you also need specify `-geo.db` flag (path to geoIP database file).
+For local geoIP database usage you also need specify `--geo.db` flag (path to geoIP database file).
 
 Available configuration flags:
 
 ```bash
-./auth_exporter -h
+./auth_exporter --help
+usage: auth_exporter [<flags>]
 
-Usage of ./auth_exporter:
-  -auth.log string
-        Path to auth.log (default "/var/log/auth.log")
-  -geo.db string
-        Path to geoIP database file
-  -geo.lang string
-        Output language format (default "en")
-  -geo.type string
-        Type of geoIP database: db, url
-  -geo.url string
-        URL for geoIP database API (default "https://freegeoip.live/json/")
-  -prom.endpoint string
-        Endpoint used for metrics (default "/metrics")
-  -prom.port string
-        Port for prometheus metrics to listen on (default "9991")
+Flags:
+  --help                      Show context-sensitive help (also try --help-long and --help-man).
+  --prom.port="9991"          Port for prometheus metrics to listen on.
+  --prom.endpoint="/metrics"  Endpoint used for metrics.
+  --auth.log="/var/log/auth.log"  
+                              Path to auth.log.
+  --geo.db=""                 Path to geoIP database file.
+  --geo.lang="en"             Output language format.
+  --geo.url="https://freegeoip.live/json/"  
+                              URL for geoIP database API.
+  --geo.type=""               Type of geoIP database: db, url.
 ```
 
 ### geoIP
@@ -108,13 +102,13 @@ To analyze IP addresses location found in the log from local geoIP database you 
 The library [geoip2-golang](https://github.com/oschwald/geoip2-golang) is used for reading the GeoLite2 database.
 
 ```bash
-./auth_exporter -geo.type db -geo.db /path/to/GeoLite2-City.mmdb
+./auth_exporter --geo.type db --geo.db /path/to/GeoLite2-City.mmdb
 ```
 
 Уou can specify output language (default `en`):
 
 ```bash
-./auth_exporter -geo.type db -geo.db /path/to/GeoLite2-City.mmdb -geo.lang ru
+./auth_exporter --geo.type db --geo.db /path/to/GeoLite2-City.mmdb --geo.lang ru
 ```
 
 Metric example:
@@ -128,7 +122,7 @@ auth_exporter_auth_events{cityName="Пекин",countryName="Китай",countyI
 To analyze IP addresses location using external API https://freegeoip.live:
 
 ```bash
-./auth_exporter -geo.type url
+./auth_exporter --geo.type url
 ```
 
 Be aware that API has a limit of **10K requests per hour**.
@@ -150,7 +144,6 @@ make run-test
 * Register `auth_exporter` (already builded, if not - exec `make build` before) as a systemd service:
 
 ```bash
-cd ${GOPATH-$HOME/go}/src/github.com/woblerr/prom_authlog_exporter
 make prepare-service
 ```
 
@@ -169,7 +162,6 @@ journalctl -u auth_exporter.service
 * Delete systemd service:
 
 ```bash
-cd ${GOPATH-$HOME/go}/src/github.com/woblerr/prom_authlog_exporter
 sudo make remove-service
 ```
 
@@ -177,7 +169,6 @@ sudo make remove-service
 Manual register systemd service:
 
 ```bash
-cd ${GOPATH-$HOME/go}/src/github.com/woblerr/prom_authlog_exporter
 cp auth_exporter.service.template auth_exporter.service
 ```
 
@@ -206,7 +197,7 @@ make docker-build
 or manual:
 
 ```bash
-docker build -t auth_exporter .
+docker build  -f Dockerfile  -t auth_exporter.
 ```
 
 * Run container
@@ -224,5 +215,5 @@ docker run -d --restart=always \
   -v /var/log/auth.log:/log/auth.log:ro \
   -u $(id -u):$(id -g) \
   auth_exporter \
-  -auth.log /log/auth.log
+  --auth.log /log/auth.log
 ```
