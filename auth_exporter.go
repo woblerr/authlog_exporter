@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -9,22 +8,44 @@ import (
 	"syscall"
 
 	"github.com/woblerr/prom_authlog_exporter/promexporter"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-var (
-	promPort    = flag.String("prom.port", "9991", "Port for prometheus metrics to listen on")
-	promPath    = flag.String("prom.endpoint", "/metrics", "Endpoint used for metrics")
-	authlogPath = flag.String("auth.log", "/var/log/auth.log", "Path to auth.log")
-	geodbPath   = flag.String("geo.db", "", "Path to geoIP database file")
-	geodbLang   = flag.String("geo.lang", "en", "Output language format")
-	geodbURL    = flag.String("geo.url", "https://freegeoip.live/json/", "URL for geoIP database API ")
-	geodbType   = flag.String("geo.type", "", "Type of geoIP database: db, url")
-	version     = "development"
-)
+var version = "unknown"
 
 func main() {
-	// Load command line arguments
-	flag.Parse()
+	var (
+		promPort = kingpin.Flag(
+			"prom.port",
+			"Port for prometheus metrics to listen on.",
+		).Default("9991").String()
+		promPath = kingpin.Flag(
+			"prom.endpoint",
+			"Endpoint used for metrics.",
+		).Default("/metrics").String()
+		authlogPath = kingpin.Flag(
+			"auth.log",
+			"Path to auth.log.",
+		).Default("/var/log/auth.log").Srting()
+		geodbPath = kingpin.Flag(
+			"geo.db",
+			"Path to geoIP database file.",
+		).Default("").String()
+		geodbLang = kingpin.Flag(
+			"geo.lang",
+			"Output language format.",
+		).Default("en").String()
+		geodbURL = kingpin.Flag(
+			"geo.url",
+			"URL for geoIP database API.",
+		).Default("https://freegeoip.live/json/").String()
+		geodbType = kingpin.Flag(
+			"geo.type",
+			"Type of geoIP database: db, url.",
+		).Default("").String()
+	)
+	// Load command line arguments.
+	kingpin.Parse()
 	// Setup signal catching
 	sigs := make(chan os.Signal, 1)
 	// Catch  listed signals
