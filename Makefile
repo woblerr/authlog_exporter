@@ -38,7 +38,7 @@ dist:
 run-test:
 	@echo "Run $(APP_NAME) for test log: ./test/auth.log"
 	@make build
-	./$(APP_NAME) -auth.log ./test_log/auth.log &
+	./$(APP_NAME) --auth.log ./test_log/auth.log &
 	$(call http-test)
 	pkill -f $(APP_NAME)
 
@@ -46,7 +46,7 @@ run-test:
 run-test-darwin:
 	@echo "Run $(APP_NAME) for test log: ./test/auth.log"
 	@make build-darwin
-	./$(APP_NAME) -auth.log ./test_log/auth.log &
+	./$(APP_NAME) --auth.log ./test_log/auth.log &
 	$(call http-test)
 	pkill -f $(APP_NAME)
 
@@ -112,7 +112,7 @@ define run-container
 		-v ${1} \
 		-u $(shell id -u):$(shell id -g) \
 		$(APP_NAME) \
-		-auth.log /log/auth.log
+		--auth.log /log/auth.log
 endef
 
 define http-test
