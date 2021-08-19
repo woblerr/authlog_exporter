@@ -26,7 +26,7 @@ func main() {
 		authlogPath = kingpin.Flag(
 			"auth.log",
 			"Path to auth.log.",
-		).Default("/var/log/auth.log").Srting()
+		).Default("/var/log/auth.log").String()
 		geodbPath = kingpin.Flag(
 			"geo.db",
 			"Path to geoIP database file.",
