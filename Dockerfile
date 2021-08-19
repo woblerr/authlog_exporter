@@ -16,5 +16,8 @@ ARG REPO_BUILD_TAG
 COPY --from=builder /go/src/github.com/woblerr/prom_authlog_exporter/auth_exporter /auth_exporter
 EXPOSE 9991
 USER nobody
+LABEL \
+    org.opencontainers.image.version="${REPO_BUILD_TAG}" \
+    org.opencontainers.image.source="https://github.com/woblerr/prom_authlog_exporter"
 ENTRYPOINT ["/auth_exporter"]
 CMD ["-h"]
