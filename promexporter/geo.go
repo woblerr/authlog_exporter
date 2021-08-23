@@ -90,7 +90,7 @@ func getIPDetailsFromURL(returnValues *geoInfo, ipAddres string) {
 		return
 	}
 	var parseData map[string]interface{}
-	err = json.Unmarshal([]byte(body), &parseData)
+	err = json.Unmarshal(body, &parseData)
 	if err != nil {
 		log.Println("Error parsing json-encoded body from GeoIp URL", err)
 		return

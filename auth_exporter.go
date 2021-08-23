@@ -49,7 +49,7 @@ func main() {
 	// Setup signal catching
 	sigs := make(chan os.Signal, 1)
 	// Catch  listed signals
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	// Method invoked upon seeing signal
 	go func() {
 		s := <-sigs
