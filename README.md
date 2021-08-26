@@ -67,7 +67,7 @@ make build
 ./auth_exporter <flags>
 ```
 
-By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9090/metrics. This means that the user who runs `auth_exporter` should have read permission to file `/var/log/auth.log`. You can changed logfile location, port and endpoint by using the`--auth.log`, `--prom.port` and `--prom.endpoint` flags.
+By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9991/metrics. This means that the user who runs `auth_exporter` should have read permission to file `/var/log/auth.log`. You can changed logfile location, port and endpoint by using the`--auth.log`, `--prom.port` and `--prom.endpoint` flags.
 
 For geoIP analyze you need to specify `--geo.type` flag:
 * `db` - for local geoIP database file,
