@@ -10,10 +10,9 @@ var (
 	authlogPath string
 )
 
-// SetAuthlogPath sets path for 'auth.log' from command line argument 'auth.log'
+// SetAuthlogPath sets path for 'auth.log' from command line argument 'auth.log'.
 func SetAuthlogPath(filePath string) {
 	authlogPath = filePath
-	log.Printf("Log for parsing %s", authlogPath)
 }
 
 func startParserAuthlog(filePath string) {
@@ -29,7 +28,7 @@ func startParserAuthlog(filePath string) {
 	}
 }
 
-// Start runs promhttp endpoind and parsing log process
+// Start runs promhttp endpoind and parsing log process.
 func Start() {
 	startPromEndpoint()
 	startParserAuthlog(authlogPath)

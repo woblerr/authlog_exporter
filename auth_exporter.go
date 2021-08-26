@@ -46,23 +46,25 @@ func main() {
 	)
 	// Load command line arguments.
 	kingpin.Parse()
-	// Setup signal catching
+	// Setup signal catching.
 	sigs := make(chan os.Signal, 1)
-	// Catch  listed signals
+	// Catch  listed signals.
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	// Method invoked upon seeing signal
+	// Method invoked upon seeing signal.
 	go func() {
 		s := <-sigs
-		log.Printf("RECEIVED SIGNAL %s", s)
-		log.Printf("Stopping  %s", filepath.Base(os.Args[0]))
-		os.Exit(0)
+		log.Printf("[WARN] RECEIVED SIGNAL %s", s)
+		log.Printf("[WARN] Stopping  %s", filepath.Base(os.Args[0]))
+		os.Exit(1)
 	}()
-	log.Printf("Starting %s", filepath.Base(os.Args[0]))
-	log.Printf("Version %s", version)
-	// Setup parameters for exporter
+	log.Printf("[INFO] Starting %s", filepath.Base(os.Args[0]))
+	log.Printf("[INFO] Version %s", version)
+	// Setup parameters for exporter.
 	promexporter.SetPromPortandPath(*promPort, *promPath)
+	log.Printf("[INFO] Use port %s and HTTP endpoint %s", *promPort, *promPath)
 	promexporter.SetAuthlogPath(*authlogPath)
+	log.Printf("[INFO] Log for parsing %s", *authlogPath)
 	promexporter.SetGeodbPath(*geodbType, *geodbPath, *geodbLang, *geodbURL)
-	// Start exporter
+	// Start exporter.
 	promexporter.Start()
 }

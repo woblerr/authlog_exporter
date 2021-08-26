@@ -24,7 +24,8 @@ type geoInfo struct {
 	cityName      string
 }
 
-// SetGeodbPath sets geoIP database parameters from command line argument geo.type, geo.db and geo.lang or geo.url
+// SetGeodbPath sets geoIP database parameters from command line argument
+// geo.type, geo.db and geo.lang or geo.url.
 func SetGeodbPath(geoType, filePath, outputLang, url string) {
 	geodbType = geoType
 	geodbPath = filePath
@@ -34,42 +35,41 @@ func SetGeodbPath(geoType, filePath, outputLang, url string) {
 }
 
 func checkGeoDBFlags() {
-	notSetLogMsg := "GeoIP database is not set and not use"
 	switch geodbType {
 	case "":
-		log.Println(notSetLogMsg)
+		log.Println("[INFO] GeoIP database is not use")
 	case "db":
 		if geodbPath == "" {
-			log.Println("Error geo.db flag is not set", geodbPath)
-			log.Println(notSetLogMsg)
+			log.Println("[ERROR] Flag geo.db is not set", geodbPath)
+			log.Println("[ERROR] GeoIP database is not set")
 		} else {
 			geodbIs = true
-			log.Println("Use GeoIp database file", geodbPath)
+			log.Println("[INFO] Use GeoIp database file", geodbPath)
 		}
 	case "url":
 		geodbIs = true
-		log.Println("Use GeoIp database url", geoURL)
+		log.Println("[INFO] Use GeoIp database url", geoURL)
 	default:
-		log.Println("Error geo.type flag value is incorrect", geodbType)
-		log.Println(notSetLogMsg)
+		log.Println("[ERROR] Flag geo.type is incorrect", geodbType)
+		log.Println("[ERROR] GeoIP database is not set")
 	}
 }
 
 func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddres string) {
 	geodb, err := geoip2.Open(geodbPath)
 	if err != nil {
-		log.Println("Error opening GeoIp database file", err)
+		log.Println("[ERROR] Error opening GeoIp database file", err)
 		return
 	}
 	defer geodb.Close()
 	ip := net.ParseIP(ipAddres)
 	if ip == nil {
-		log.Println("Error parsing ip address", ipAddres)
+		log.Println("[ERROR] Error parsing ip address", ipAddres)
 		return
 	}
 	record, err := geodb.City(ip)
 	if err != nil {
-		log.Println("Error getting location details", err)
+		log.Println("[ERROR] Error getting location details", err)
 		return
 	}
 	returnValues.countyISOCode = record.Country.IsoCode
@@ -80,19 +80,19 @@ func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddres string) {
 func getIPDetailsFromURL(returnValues *geoInfo, ipAddres string) {
 	response, err := http.Get(geoURL + ipAddres)
 	if err != nil {
-		log.Println("Error getting GeoIp URL", err)
+		log.Println("[ERROR] Error getting GeoIp URL", err)
 		return
 	}
 	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Println("Error getting body from GeoIp URL", err)
+		log.Println("[ERROR] Error getting body from GeoIp URL", err)
 		return
 	}
 	var parseData map[string]interface{}
 	err = json.Unmarshal(body, &parseData)
 	if err != nil {
-		log.Println("Error parsing json-encoded body from GeoIp URL", err)
+		log.Println("[ERROR] Error parsing json-encoded body from GeoIp URL", err)
 		return
 	}
 	returnValues.countyISOCode = getMap(parseData, "country_code")
@@ -103,7 +103,7 @@ func getIPDetailsFromURL(returnValues *geoInfo, ipAddres string) {
 func getMap(data map[string]interface{}, key string) string {
 	str, ok := data[key].(string)
 	if !ok {
-		log.Printf("Error for key %s value %s is not a string", key, str)
+		log.Printf("[ERROR] Error for key %s value %s is not a string", key, str)
 	}
 	return str
 }

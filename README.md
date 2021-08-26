@@ -47,6 +47,7 @@ auth_exporter_auth_events{cityName="Beijing",countryName="China",countyISOCode="
 ```
 
 **Collecting events:**
+
 |Event type|Regexp for search event|
 |---|---|
 |authAccepted|`Accepted (password\|publickey) for (?P<user>.*) from (?P<ipAddress>.*) port`|

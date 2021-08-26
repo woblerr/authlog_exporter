@@ -41,7 +41,7 @@ func parseLine(line *tail.Line) {
 			continue
 		}
 	}
-	// Skip if not matching
+	// Skip if not matching.
 	if len(matches) == 0 {
 		return
 	}
@@ -56,7 +56,7 @@ func parseLine(line *tail.Line) {
 			getIPDetailsFromURL(geoIPData, parsedLog.IPAddress)
 		}
 	}
-	// Add metric
+	// Add metric.
 	authVentsMetric.WithLabelValues(
 		parsedLog.Type,
 		parsedLog.Username,
