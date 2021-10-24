@@ -6,16 +6,18 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/oschwald/geoip2-golang"
 )
 
 var (
-	geodbType string
-	geodbPath string
-	geoLang   string
-	geoURL    string
-	geodbIs   = false
+	geodbType  string
+	geodbPath  string
+	geoLang    string
+	geoURL     string
+	geoTimeout int
+	geodbIs    = false
 )
 
 type geoInfo struct {
@@ -25,12 +27,13 @@ type geoInfo struct {
 }
 
 // SetGeodbPath sets geoIP database parameters from command line argument
-// geo.type, geo.db and geo.lang or geo.url.
-func SetGeodbPath(geoType, filePath, outputLang, url string) {
+// geo.type, geo.db and geo.lang, geo.url or geo.timeout.
+func SetGeodbPath(geoType, filePath, outputLang, url string, timeout int) {
 	geodbType = geoType
 	geodbPath = filePath
 	geoLang = outputLang
 	geoURL = url
+	geoTimeout = timeout
 	checkGeoDBFlags()
 }
 
@@ -78,7 +81,11 @@ func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddres string) {
 }
 
 func getIPDetailsFromURL(returnValues *geoInfo, ipAddres string) {
-	response, err := http.Get(geoURL + ipAddres)
+	// Timeout for get and read response body.
+	client := http.Client{
+		Timeout: time.Duration(geoTimeout) * time.Second,
+	}
+	response, err := client.Get(geoURL + ipAddres)
 	if err != nil {
 		log.Println("[ERROR] Error getting GeoIp URL", err)
 		return

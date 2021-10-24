@@ -15,18 +15,18 @@ var version = "unknown"
 
 func main() {
 	var (
-		promPort = kingpin.Flag(
-			"prom.port",
-			"Port for prometheus metrics to listen on.",
-		).Default("9991").String()
-		promPath = kingpin.Flag(
-			"prom.endpoint",
-			"Endpoint used for metrics.",
-		).Default("/metrics").String()
 		authlogPath = kingpin.Flag(
 			"auth.log",
 			"Path to auth.log.",
 		).Default("/var/log/auth.log").String()
+		promPath = kingpin.Flag(
+			"prom.endpoint",
+			"Endpoint used for metrics.",
+		).Default("/metrics").String()
+		promPort = kingpin.Flag(
+			"prom.port",
+			"Port for prometheus metrics to listen on.",
+		).Default("9991").String()
 		geodbPath = kingpin.Flag(
 			"geo.db",
 			"Path to geoIP database file.",
@@ -35,14 +35,18 @@ func main() {
 			"geo.lang",
 			"Output language format.",
 		).Default("en").String()
-		geodbURL = kingpin.Flag(
-			"geo.url",
-			"URL for geoIP database API.",
-		).Default("https://freegeoip.live/json/").String()
+		geodbTimeout = kingpin.Flag(
+			"geo.timeout",
+			"Timeout in seconds for waiting response from geoIP database API.",
+		).Default("2").Int()
 		geodbType = kingpin.Flag(
 			"geo.type",
 			"Type of geoIP database: db, url.",
 		).Default("").String()
+		geodbURL = kingpin.Flag(
+			"geo.url",
+			"URL for geoIP database API.",
+		).Default("https://freegeoip.live/json/").String()
 	)
 	// Load command line arguments.
 	kingpin.Parse()
@@ -64,7 +68,7 @@ func main() {
 	log.Printf("[INFO] Use port %s and HTTP endpoint %s", *promPort, *promPath)
 	promexporter.SetAuthlogPath(*authlogPath)
 	log.Printf("[INFO] Log for parsing %s", *authlogPath)
-	promexporter.SetGeodbPath(*geodbType, *geodbPath, *geodbLang, *geodbURL)
+	promexporter.SetGeodbPath(*geodbType, *geodbPath, *geodbLang, *geodbURL, *geodbTimeout)
 	// Start exporter.
 	promexporter.Start()
 }
