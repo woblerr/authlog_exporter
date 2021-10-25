@@ -10,10 +10,10 @@
 *.tar.gz
 
 # Binary file
-/auth_exporter
+/authlog_exporter
 
 # Service file
-/auth_exporter.service
+/authlog_exporter.service
 
 # Geo
 /GeoLite*

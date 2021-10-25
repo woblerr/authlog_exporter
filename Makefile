@@ -1,4 +1,4 @@
-APP_NAME = auth_exporter
+APP_NAME = authlog_exporter
 BRANCH_FULL=$(shell git rev-parse --abbrev-ref HEAD)
 BRANCH=$(subst /,-,$(BRANCH_FULL))
 GIT_REV=$(shell git describe --abbrev=7 --always)
@@ -126,5 +126,5 @@ endef
 
 define http-test
 	sleep 2
-	curl -s "http://localhost:9991/metrics"| grep "^auth_exporter_auth_events"
+	curl -s "http://localhost:9991/metrics"| grep "^authlog_exporter_auth_events"
 endef

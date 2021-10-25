@@ -1,5 +1,5 @@
 ---
-project_name: auth_exporter
+project_name: authlog_exporter
 
 builds:
   - env: 

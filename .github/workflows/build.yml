@@ -70,8 +70,8 @@ jobs:
           docker buildx build --push \
               --build-arg REPO_BUILD_TAG=${ref}-${sha} \
               --platform linux/amd64,linux/arm64 \
-              -t ghcr.io/${GITHUB_USER}/auth_exporter:${ref} \
-              -t ${DOCKERHUB_USER}/auth_exporter:${ref} .
+              -t ghcr.io/${GITHUB_USER}/authlog_exporter:${ref} \
+              -t ${DOCKERHUB_USER}/authlog_exporter:${ref} .
 
       - name: Build and push tag (latest) image to ghcr.io and Docker Hub
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
@@ -90,10 +90,10 @@ jobs:
           docker buildx build --push \
               --build-arg REPO_BUILD_TAG=${ref} \
               --platform linux/amd64,linux/arm64 \
-              -t ghcr.io/${GITHUB_USER}/auth_exporter:${ref} \
-              -t ghcr.io/${GITHUB_USER}/auth_exporter:latest \
-              -t ${DOCKERHUB_USER}/auth_exporter:${ref} \
-              -t ${DOCKERHUB_USER}/auth_exporter:latest .
+              -t ghcr.io/${GITHUB_USER}/authlog_exporter:${ref} \
+              -t ghcr.io/${GITHUB_USER}/authlog_exporter:latest \
+              -t ${DOCKERHUB_USER}/authlog_exporter:${ref} \
+              -t ${DOCKERHUB_USER}/authlog_exporter:latest .
 
   goreleaser:
     needs: build

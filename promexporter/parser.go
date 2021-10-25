@@ -18,7 +18,7 @@ var (
 		"connectionClosed": regexp.MustCompile(authLinePrefix + "Connection closed by authenticating user (?P<user>.*) (?P<ipAddress>.*) port"),
 	}
 	authVentsMetric = promauto.NewCounterVec(prometheus.CounterOpts{
-		Name: "auth_exporter_auth_events",
+		Name: "authlog_exporter_auth_events",
 		Help: "The total number of auth events by user and IP addresses",
 	},
 		[]string{"eventType", "user", "ipAddress", "countyISOCode", "countryName", "cityName"})

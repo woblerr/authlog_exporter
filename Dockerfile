@@ -9,15 +9,15 @@ RUN apk update \
     && CGO_ENABLED=0 go build \
         -mod=vendor -trimpath \
         -ldflags "-X main.version=${REPO_BUILD_TAG}" \
-        -o auth_exporter auth_exporter.go
+        -o authlog_exporter authlog_exporter.go
 
 FROM scratch
 ARG REPO_BUILD_TAG
-COPY --from=builder /go/src/github.com/woblerr/prom_authlog_exporter/auth_exporter /auth_exporter
+COPY --from=builder /go/src/github.com/woblerr/prom_authlog_exporter/authlog_exporter /authlog_exporter
 EXPOSE 9991
 USER nobody
 LABEL \
     org.opencontainers.image.version="${REPO_BUILD_TAG}" \
     org.opencontainers.image.source="https://github.com/woblerr/prom_authlog_exporter"
-ENTRYPOINT ["/auth_exporter"]
+ENTRYPOINT ["/authlog_exporter"]
 CMD ["-h"]
