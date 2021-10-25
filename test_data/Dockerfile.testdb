@@ -1,0 +1,24 @@
+ARG SCRIPT_PATH="./create_test_database.pl"
+
+FROM perl:buster as builder
+ARG SCRIPT_PATH
+RUN apt-get -y update \
+    && apt-get -y install \
+        libmaxminddb0 \
+        libmaxminddb-dev \
+        mmdb-bin \
+        cpanminus \
+    && cpanm \
+        MaxMind::DB::Common \
+        MaxMind::DB::Writer \
+    && apt-get autoremove -y \
+    && apt-get autopurge -y \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
+COPY --chmod=755 ${SCRIPT_PATH} /build
+RUN /build/create_test_database.pl
+
+FROM alpine
+COPY --from=builder /build/geolite2_test.mmdb /db/
+RUN ls -la /db/*
+CMD ["sleep", "150"]

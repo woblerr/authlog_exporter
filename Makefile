@@ -38,7 +38,7 @@ dist:
 run-test:
 	@echo "Run $(APP_NAME) for test log: ./test/auth.log"
 	@make build
-	./$(APP_NAME) --auth.log ./test_log/auth.log &
+	./$(APP_NAME) --auth.log ./test_data/auth.log &
 	$(call http-test)
 	pkill -f $(APP_NAME)
 
@@ -46,7 +46,7 @@ run-test:
 run-test-darwin:
 	@echo "Run $(APP_NAME) for test log: ./test/auth.log"
 	@make build-darwin
-	./$(APP_NAME) --auth.log ./test_log/auth.log &
+	./$(APP_NAME) --auth.log ./test_data/auth.log &
 	$(call http-test)
 	pkill -f $(APP_NAME)
 
@@ -81,7 +81,7 @@ docker-run:
 .PHONY: docker-run-test
 docker-run-test:
 	@echo "Run $(APP_NAME) docker container for test log: ./test/auth.log"
-	$(call run-container, $(PWD)/test_log/auth.log:/log/auth.log:ro)
+	$(call run-container, $(PWD)/test_data/auth.log:/log/auth.log:ro)
 	$(call http-test)
 	@make docker-remove
 
@@ -89,6 +89,15 @@ docker-run-test:
 docker-remove:
 	@echo "Stop and delete $(APP_NAME) docker container"
 	docker rm -f $(APP_NAME)
+
+.PHONY: docker-build-test-db
+docker-build-test-db:
+	@echo "Build custom Maxmind database for tests"
+	docker build -f test_data/Dockerfile.testdb --build-arg SCRIPT_PATH="test_data/create_test_database.pl" --progress=plain -t $(APP_NAME)_build_test_db .
+	- @docker rm -f $(APP_NAME)_build_test_db 2>/dev/null || exit 0
+	docker run -d --name=$(APP_NAME)_build_test_db $(APP_NAME)_build_test_db
+	docker cp $(APP_NAME)_build_test_db:/db/geolite2_test.mmdb test_data/
+	docker rm -f $(APP_NAME)_build_test_db
 
 define service-install
 	cp $(ROOT_DIR)/$(APP_NAME).service $(SERVICE_CONF_DIR)/$(APP_NAME).service

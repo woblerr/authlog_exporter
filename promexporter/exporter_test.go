@@ -6,7 +6,7 @@ import (
 
 func TestSetAuthlogPath(t *testing.T) {
 	var (
-		testLog = "/test_log/auth.log"
+		testLog = "/test_data/auth.log"
 	)
 	SetAuthlogPath(testLog)
 	if testLog != authlogPath {

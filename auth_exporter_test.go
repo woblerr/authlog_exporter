@@ -22,7 +22,7 @@ func TestMain(t *testing.T) {
 		"auth_exporter",
 		"--prom.port=" + strconv.Itoa(port),
 		"--auth.log",
-		"./test_log/auth.log"}
+		"./test_data/auth.log"}
 	finished := make(chan struct{})
 	go func() {
 		main()
