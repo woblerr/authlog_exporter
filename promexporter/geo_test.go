@@ -267,7 +267,6 @@ func serverMock() *httptest.Server {
 		})
 	handler.HandleFunc("/nobody/"+testIP,
 		func(rw http.ResponseWriter, req *http.Request) {
-			//rw.WriteHeader(http.StatusInternalServerError)
 			rw.Header().Set("Content-Length", "1")
 		})
 	handler.HandleFunc("/badbody/"+testIP,
