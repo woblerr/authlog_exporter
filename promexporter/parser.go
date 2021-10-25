@@ -18,8 +18,8 @@ var (
 		"connectionClosed": regexp.MustCompile(authLinePrefix + "Connection closed by authenticating user (?P<user>.*) (?P<ipAddress>.*) port"),
 	}
 	authVentsMetric = promauto.NewCounterVec(prometheus.CounterOpts{
-		Name: "authlog_exporter_auth_events",
-		Help: "The total number of auth events by user and IP addresses",
+		Name: "authlog_events_total",
+		Help: "The total number of auth events.",
 	},
 		[]string{"eventType", "user", "ipAddress", "countyISOCode", "countryName", "cityName"})
 )
@@ -33,7 +33,7 @@ type authLogLine struct {
 func parseLine(line *tail.Line) {
 	parsedLog := &authLogLine{}
 	matches := make(map[string]string)
-	// Find the type of log and parse it
+	// Find the type of log and parse it.
 	for t, re := range authLineRegexps {
 		if re.MatchString(line.Text) {
 			parsedLog.Type = t
@@ -48,7 +48,7 @@ func parseLine(line *tail.Line) {
 	geoIPData := &geoInfo{}
 	parsedLog.Username = matches["user"]
 	parsedLog.IPAddress = matches["ipAddress"]
-	// Get geo information
+	// Get geo information.
 	if geodbIs {
 		if geodbType == "db" {
 			getIPDetailsFromLocalDB(geoIPData, parsedLog.IPAddress)
@@ -70,7 +70,7 @@ func parseLine(line *tail.Line) {
 func getMatches(line string, re *regexp.Regexp) map[string]string {
 	matches := re.FindStringSubmatch(line)
 	results := make(map[string]string)
-	// Get the basic information out of the log
+	// Get the basic information out of the log.
 	for i, name := range re.SubexpNames() {
 		if i != 0 && len(matches) > i {
 			results[name] = matches[i]

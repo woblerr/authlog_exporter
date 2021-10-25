@@ -126,5 +126,5 @@ endef
 
 define http-test
 	sleep 2
-	curl -s "http://localhost:9991/metrics"| grep "^authlog_exporter_auth_events"
+	curl -s "http://localhost:9991/metrics"| grep "^authlog_events_total"
 endef
