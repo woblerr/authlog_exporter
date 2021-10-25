@@ -1,4 +1,4 @@
-module github.com/woblerr/prom_authlog_exporter
+module github.com/woblerr/authlog_exporter
 
 go 1.17
 

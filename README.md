@@ -1,8 +1,8 @@
-# prom_authlog_exporter
+# authlog_exporter
 
-[![Actions Status](https://github.com/woblerr/prom_authlog_exporter/workflows/build/badge.svg)](https://github.com/woblerr/prom_authlog_exporter/actions)
-[![Coverage Status](https://coveralls.io/repos/github/woblerr/prom_authlog_exporter/badge.svg?branch=master)](https://coveralls.io/github/woblerr/prom_authlog_exporter?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/woblerr/prom_authlog_exporter)](https://goreportcard.com/report/github.com/woblerr/prom_authlog_exporter)
+[![Actions Status](https://github.com/woblerr/authlog_exporter/workflows/build/badge.svg)](https://github.com/woblerr/authlog_exporter/actions)
+[![Coverage Status](https://coveralls.io/repos/github/woblerr/authlog_exporter/badge.svg?branch=master)](https://coveralls.io/github/woblerr/authlog_exporter?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/woblerr/authlog_exporter)](https://goreportcard.com/report/github.com/woblerr/authlog_exporter)
 
 Prometheus exporter for collecting metrics from linux `auth.log` file.
 
@@ -61,8 +61,8 @@ authlog_events_total{cityName="Beijing",countryName="China",countyISOCode="CN",e
 ### Building and running
 
 ```bash
-git clone https://github.com/woblerr/prom_authlog_exporter.git
-cd prom_authlog_exporter
+git clone https://github.com/woblerr/authlog_exporter.git
+cd authlog_exporter
 make build
 ./authlog_exporter <flags>
 ```
@@ -83,15 +83,16 @@ usage: authlog_exporter [<flags>]
 
 Flags:
   --help                      Show context-sensitive help (also try --help-long and --help-man).
-  --prom.port="9991"          Port for prometheus metrics to listen on.
-  --prom.endpoint="/metrics"  Endpoint used for metrics.
   --auth.log="/var/log/auth.log"  
                               Path to auth.log.
+  --prom.endpoint="/metrics"  Endpoint used for metrics.
+  --prom.port="9991"          Port for prometheus metrics to listen on.
   --geo.db=""                 Path to geoIP database file.
   --geo.lang="en"             Output language format.
+  --geo.timeout=2             Timeout in seconds for waiting response from geoIP database API.
+  --geo.type=""               Type of geoIP database: db, url.
   --geo.url="https://freegeoip.live/json/"  
                               URL for geoIP database API.
-  --geo.type=""               Type of geoIP database: db, url.
 ```
 
 ### geoIP

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/woblerr/prom_authlog_exporter/promexporter"
+	"github.com/woblerr/authlog_exporter/promexporter"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
