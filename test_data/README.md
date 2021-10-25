@@ -13,6 +13,6 @@ or
 cd ./test_data
 docker build -f Dockerfile.testdb -t auth_exporter_build_test_db .
 docker run -d --name=auth_exporter_build_test_db auth_exporter_build_test_db
-docker cp auth_exporter_build_test_db:/db/geolite2_test.mmdb test_data/
+docker cp auth_exporter_build_test_db:/db/geolite2_test.mmdb ./
 docker rm -f auth_exporter_build_test_db
 ```
