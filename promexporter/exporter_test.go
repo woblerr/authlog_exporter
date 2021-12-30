@@ -2,7 +2,12 @@ package promexporter
 
 import (
 	"testing"
+
+	"github.com/go-kit/log"
+	"github.com/prometheus/common/promlog"
 )
+
+var logger = getLogger()
 
 func TestSetExporterParams(t *testing.T) {
 	var (
@@ -20,4 +25,19 @@ func TestSetExporterParams(t *testing.T) {
 			testTLSConfigPath, promTLSConfigPath,
 		)
 	}
+}
+
+func getLogger() log.Logger {
+	var err error
+	logLevel := &promlog.AllowedLevel{}
+	err = logLevel.Set("info")
+	if err != nil {
+		panic(err)
+	}
+	promlogConfig := &promlog.Config{}
+	promlogConfig.Level = logLevel
+	if err != nil {
+		panic(err)
+	}
+	return promlog.New(promlogConfig)
 }

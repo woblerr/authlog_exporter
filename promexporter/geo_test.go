@@ -11,10 +11,7 @@ import (
 	"time"
 
 	"github.com/go-kit/log"
-	"github.com/prometheus/common/promlog"
 )
-
-var logger = getLogger()
 
 func TestSetGeodbPath(t *testing.T) {
 	type args struct {
@@ -288,19 +285,4 @@ func getFullPath(relativeFilePath string) string {
 		panic(err)
 	}
 	return absPath
-}
-
-func getLogger() log.Logger {
-	var err error
-	logLevel := &promlog.AllowedLevel{}
-	err = logLevel.Set("info")
-	if err != nil {
-		panic(err)
-	}
-	promlogConfig := &promlog.Config{}
-	promlogConfig.Level = logLevel
-	if err != nil {
-		panic(err)
-	}
-	return promlog.New(promlogConfig)
 }
