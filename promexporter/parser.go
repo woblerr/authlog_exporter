@@ -3,6 +3,7 @@ package promexporter
 import (
 	"regexp"
 
+	"github.com/go-kit/log"
 	"github.com/hpcloud/tail"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -30,7 +31,7 @@ type authLogLine struct {
 	IPAddress string
 }
 
-func parseLine(line *tail.Line) {
+func parseLine(line *tail.Line, logger log.Logger) {
 	parsedLog := &authLogLine{}
 	matches := make(map[string]string)
 	// Find the type of log and parse it.
@@ -51,9 +52,9 @@ func parseLine(line *tail.Line) {
 	// Get geo information.
 	if geodbIs {
 		if geodbType == "db" {
-			getIPDetailsFromLocalDB(geoIPData, parsedLog.IPAddress)
+			getIPDetailsFromLocalDB(geoIPData, parsedLog.IPAddress, logger)
 		} else {
-			getIPDetailsFromURL(geoIPData, parsedLog.IPAddress)
+			getIPDetailsFromURL(geoIPData, parsedLog.IPAddress, logger)
 		}
 	}
 	// Add metric.

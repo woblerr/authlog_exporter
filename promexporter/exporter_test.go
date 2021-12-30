@@ -4,12 +4,20 @@ import (
 	"testing"
 )
 
-func TestSetAuthlogPath(t *testing.T) {
+func TestSetExporterParams(t *testing.T) {
 	var (
-		testLog = "/test_data/auth.log"
+		testLog           = "/test_data/auth.log"
+		testPort          = "9991"
+		testEndpoit       = "/metrics"
+		testTLSConfigPath = ""
 	)
-	SetAuthlogPath(testLog)
-	if testLog != authlogPath {
-		t.Errorf("Variables do not match: %s,\nwant: %s", testLog, authlogPath)
+	SetExporterParams(testLog, testPort, testEndpoit, testTLSConfigPath)
+	if testLog != authlogPath || testPort != promPort || testEndpoit != promEndpoint || testTLSConfigPath != promTLSConfigPath {
+		t.Errorf("\nVariables do not match,\nlog: %s, want: %s;\nport: %s, want: %s;\nendpoint: %s, want: %s;\nconfig: %s, want: %s",
+			testLog, authlogPath,
+			testPort, promPort,
+			testEndpoit, promEndpoint,
+			testTLSConfigPath, promTLSConfigPath,
+		)
 	}
 }

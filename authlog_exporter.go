@@ -1,12 +1,15 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/prometheus/common/promlog"
+	"github.com/prometheus/common/promlog/flag"
 	"github.com/woblerr/authlog_exporter/promexporter"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -27,6 +30,10 @@ func main() {
 			"prom.port",
 			"Port for prometheus metrics to listen on.",
 		).Default("9991").String()
+		promTLSConfigFile = kingpin.Flag(
+			"prom.web-config",
+			"[EXPERIMENTAL] Path to config yaml file that can enable TLS or authentication.",
+		).Default("").String()
 		geodbPath = kingpin.Flag(
 			"geo.db",
 			"Path to geoIP database file.",
@@ -48,27 +55,44 @@ func main() {
 			"URL for geoIP database API.",
 		).Default("https://freegeoip.live/json/").String()
 	)
+	// Set logger config.
+	promlogConfig := &promlog.Config{}
+	// Add flags log.level and log.format from promlog package.
+	flag.AddFlags(kingpin.CommandLine, promlogConfig)
+	// Add short help flag.
+	kingpin.HelpFlag.Short('h')
 	// Load command line arguments.
 	kingpin.Parse()
 	// Setup signal catching.
 	sigs := make(chan os.Signal, 1)
 	// Catch  listed signals.
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	// Set logger.
+	logger := promlog.New(promlogConfig)
 	// Method invoked upon seeing signal.
-	go func() {
+	go func(logger log.Logger) {
 		s := <-sigs
-		log.Printf("[WARN] RECEIVED SIGNAL %s", s)
-		log.Printf("[WARN] Stopping  %s", filepath.Base(os.Args[0]))
+		level.Warn(logger).Log(
+			"msg", "Stopping exporter",
+			"name", filepath.Base(os.Args[0]),
+			"signal", s)
 		os.Exit(1)
-	}()
-	log.Printf("[INFO] Starting %s", filepath.Base(os.Args[0]))
-	log.Printf("[INFO] Version %s", version)
+	}(logger)
+	level.Info(logger).Log(
+		"msg", "Starting exporter",
+		"name", filepath.Base(os.Args[0]),
+		"version", version,
+	)
 	// Setup parameters for exporter.
-	promexporter.SetPromPortandPath(*promPort, *promPath)
-	log.Printf("[INFO] Use port %s and HTTP endpoint %s", *promPort, *promPath)
-	promexporter.SetAuthlogPath(*authlogPath)
-	log.Printf("[INFO] Log for parsing %s", *authlogPath)
-	promexporter.SetGeodbPath(*geodbType, *geodbPath, *geodbLang, *geodbURL, *geodbTimeout)
+	promexporter.SetExporterParams(*authlogPath, *promPort, *promPath, *promTLSConfigFile)
+	level.Info(logger).Log(
+		"authlog", *authlogPath,
+		"mgs", "Use port and HTTP endpoint",
+		"port", *promPort,
+		"endpoint", *promPath,
+		"web-config", *promTLSConfigFile,
+	)
+	promexporter.SetGeodbPath(*geodbType, *geodbPath, *geodbLang, *geodbURL, *geodbTimeout, logger)
 	// Start exporter.
-	promexporter.Start()
+	promexporter.Start(logger)
 }

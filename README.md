@@ -75,6 +75,9 @@ For geoIP analyze you need to specify `--geo.type` flag:
 
 For local geoIP database usage you also need specify `--geo.db` flag (path to geoIP database file).
 
+The flag `--prom.web-config` allows to specify the path to the configuration for TLS and/or basic authentication.<br>
+The description of TLS configuration and basic authentication can be found at [exporter-toolkit/web](https://github.com/prometheus/exporter-toolkit/blob/v0.7.1/docs/web-configuration.md).
+
 Available configuration flags:
 
 ```bash
@@ -82,17 +85,21 @@ Available configuration flags:
 usage: authlog_exporter [<flags>]
 
 Flags:
-  --help                      Show context-sensitive help (also try --help-long and --help-man).
-  --auth.log="/var/log/auth.log"  
-                              Path to auth.log.
-  --prom.endpoint="/metrics"  Endpoint used for metrics.
-  --prom.port="9991"          Port for prometheus metrics to listen on.
-  --geo.db=""                 Path to geoIP database file.
-  --geo.lang="en"             Output language format.
-  --geo.timeout=2             Timeout in seconds for waiting response from geoIP database API.
-  --geo.type=""               Type of geoIP database: db, url.
-  --geo.url="https://freegeoip.live/json/"  
-                              URL for geoIP database API.
+  -h, --help                Show context-sensitive help (also try --help-long and --help-man).
+      --auth.log="/var/log/auth.log"  
+                            Path to auth.log.
+      --prom.endpoint="/metrics"  
+                            Endpoint used for metrics.
+      --prom.port="9991"    Port for prometheus metrics to listen on.
+      --prom.web-config=""  [EXPERIMENTAL] Path to config yaml file that can enable TLS or authentication.
+      --geo.db=""           Path to geoIP database file.
+      --geo.lang="en"       Output language format.
+      --geo.timeout=2       Timeout in seconds for waiting response from geoIP database API.
+      --geo.type=""         Type of geoIP database: db, url.
+      --geo.url="https://freegeoip.live/json/"  
+                            URL for geoIP database API.
+      --log.level=info      Only log messages with the given severity or above. One of: [debug, info, warn, error]
+      --log.format=logfmt   Output format of log messages. One of: [logfmt, json]
 ```
 
 ### geoIP

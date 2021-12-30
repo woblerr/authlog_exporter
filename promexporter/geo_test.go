@@ -2,16 +2,19 @@ package promexporter
 
 import (
 	"bytes"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-kit/log"
+	"github.com/prometheus/common/promlog"
 )
+
+var logger = getLogger()
 
 func TestSetGeodbPath(t *testing.T) {
 	type args struct {
@@ -28,40 +31,38 @@ func TestSetGeodbPath(t *testing.T) {
 	}{
 		{"defaultGeodbType",
 			args{"", "", "", "", 2},
-			"[INFO] GeoIP database is not use",
+			"GeoIP database is not use",
 		},
 		{"dbGeodbTypePathEmpty",
 			args{"db", "", "", "", 2},
-			"[ERROR] Flag geo.db is not set",
+			"Flag geo.db is not set",
 		},
 		{"dbGeodbTypePathNotEmpty",
 			args{"db", "test.file", "", "", 2},
-			"[INFO] Use GeoIp database file",
+			"Use GeoIp database file",
 		},
 		{"urlGeodbType",
 			args{"url", "", "", "http://test", 2},
-			"[INFO] Use GeoIp database url",
+			"Use GeoIp database url",
 		},
 		{"badGeodbType",
 			args{"test", "", "", "", 2},
-			"[ERROR] Flag geo.type is incorrect",
+			"Flag geo.type is incorrect",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var buf bytes.Buffer
-			log.SetOutput(&buf)
-			defer func() {
-				log.SetOutput(os.Stdout)
-			}()
+			out := &bytes.Buffer{}
+			lc := log.NewLogfmtLogger(out)
 			SetGeodbPath(
 				tt.args.geoType,
 				tt.args.filePath,
 				tt.args.outputLang,
 				tt.args.url,
-				tt.args.timeout)
-			if got := buf.String(); !strings.Contains(got, tt.want) {
-				t.Errorf("\nSetGeodbPath() log output:\n%s\nnot containt want:\n%s", got, tt.want)
+				tt.args.timeout,
+				lc)
+			if !strings.Contains(out.String(), tt.want) {
+				t.Errorf("\nVariable do not match:\n%s\nwant:\n%s", tt.want, out.String())
 			}
 		})
 	}
@@ -92,7 +93,7 @@ func TestGetMap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getMap(tt.args.data, tt.args.key); got != tt.want {
+			if got := getMap(tt.args.data, tt.args.key, logger); got != tt.want {
 				t.Errorf("\ngetMap() =\n%v,\nwant=\n%v", got, tt.want)
 			}
 		})
@@ -125,7 +126,7 @@ func TestGetIPDetailsFromURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			geoURL = tt.testGeoURL
-			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddres)
+			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddres, logger)
 			if !reflect.DeepEqual(tt.args.returnValues, tt.want) {
 				t.Errorf("\ngetIPDetailsFromURL() =\n%v,\nwant=\n%v", tt.args.returnValues, tt.want)
 			}
@@ -153,30 +154,30 @@ func TestGetIPDetailsFromURLErrors(t *testing.T) {
 		{"getIPGetError",
 			reqArgs,
 			"http://test",
-			"[ERROR] Error getting GeoIp URL",
+			"Error getting GeoIp URL",
 		},
 		{"getIPNoBody",
 			reqArgs,
 			srv.URL + "/nobody/",
-			"[ERROR] Error getting body from GeoIp URL",
+			"Error getting body from GeoIp URL",
 		},
 		{"getIPParseBodyError",
 			reqArgs,
 			srv.URL + "/badbody/",
-			"[ERROR] Error parsing json-encoded body from GeoIp URL",
+			"Error parsing json-encoded body from GeoIp URL",
 		},
 		{"getIPGetNoResponse",
 			reqArgs,
 			srv.URL + "/longresponse/",
-			"[ERROR] Error getting GeoIp URL",
+			"Error getting GeoIp URL",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			geoURL = tt.testGeoURL
 			out := &bytes.Buffer{}
-			log.SetOutput(out)
-			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddres)
+			lc := log.NewLogfmtLogger(out)
+			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddres, lc)
 			if !strings.Contains(out.String(), tt.testText) {
 				t.Errorf("\nVariable do not match:\n%s\nwant:\n%s", tt.testText, out.String())
 			}
@@ -208,7 +209,7 @@ func TestGetIPDetailsFromLocalDB(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			geodbPath = getFullPath(tt.testGeoFile)
-			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddres)
+			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddres, logger)
 			if !reflect.DeepEqual(tt.args.returnValues, tt.want) {
 				t.Errorf("\ngetIPDetailsFromURL() =\n%v,\nwant=\n%v", tt.args.returnValues, tt.want)
 			}
@@ -233,7 +234,7 @@ func TestGetIPDetailsFromLocalDBErrors(t *testing.T) {
 				"12.123.12.123",
 			},
 			"../test_data/GeoLite2-City-Missing.mmdb",
-			"[ERROR] Error opening GeoIp database file",
+			"Error opening GeoIp database file",
 		},
 		{"getIPDetailErrorParseIP",
 			args{
@@ -241,15 +242,15 @@ func TestGetIPDetailsFromLocalDBErrors(t *testing.T) {
 				"12.123.12.",
 			},
 			"../test_data/geolite2_test.mmdb",
-			"[ERROR] Error parsing ip address",
+			"Error parsing ip address",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			geodbPath = getFullPath(tt.testGeoFile)
 			out := &bytes.Buffer{}
-			log.SetOutput(out)
-			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddres)
+			lc := log.NewLogfmtLogger(out)
+			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddres, lc)
 			if !strings.Contains(out.String(), tt.testText) {
 				t.Errorf("\nVariable do not match:\n%s\nwant:\n%s", tt.testText, out.String())
 			}
@@ -287,4 +288,19 @@ func getFullPath(relativeFilePath string) string {
 		panic(err)
 	}
 	return absPath
+}
+
+func getLogger() log.Logger {
+	var err error
+	logLevel := &promlog.AllowedLevel{}
+	err = logLevel.Set("info")
+	if err != nil {
+		panic(err)
+	}
+	promlogConfig := &promlog.Config{}
+	promlogConfig.Level = logLevel
+	if err != nil {
+		panic(err)
+	}
+	return promlog.New(promlogConfig)
 }

@@ -3,11 +3,12 @@ package promexporter
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"time"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/oschwald/geoip2-golang"
 )
 
@@ -28,51 +29,49 @@ type geoInfo struct {
 
 // SetGeodbPath sets geoIP database parameters from command line argument
 // geo.type, geo.db and geo.lang, geo.url or geo.timeout.
-func SetGeodbPath(geoType, filePath, outputLang, url string, timeout int) {
+func SetGeodbPath(geoType, filePath, outputLang, url string, timeout int, logger log.Logger) {
 	geodbType = geoType
 	geodbPath = filePath
 	geoLang = outputLang
 	geoURL = url
 	geoTimeout = timeout
-	checkGeoDBFlags()
+	checkGeoDBFlags(logger)
 }
 
-func checkGeoDBFlags() {
+func checkGeoDBFlags(logger log.Logger) {
 	switch geodbType {
 	case "":
-		log.Println("[INFO] GeoIP database is not use")
+		level.Info(logger).Log("msg", "GeoIP database is not use")
 	case "db":
 		if geodbPath == "" {
-			log.Println("[ERROR] Flag geo.db is not set", geodbPath)
-			log.Println("[ERROR] GeoIP database is not set")
+			level.Error(logger).Log("msg", "Flag geo.db is not set", "file", geodbPath)
 		} else {
 			geodbIs = true
-			log.Println("[INFO] Use GeoIp database file", geodbPath)
+			level.Info(logger).Log("msg", "Use GeoIp database file", "file", geodbPath)
 		}
 	case "url":
 		geodbIs = true
-		log.Println("[INFO] Use GeoIp database url", geoURL)
+		level.Info(logger).Log("msg", "Use GeoIp database url", "url", geoURL)
 	default:
-		log.Println("[ERROR] Flag geo.type is incorrect", geodbType)
-		log.Println("[ERROR] GeoIP database is not set")
+		level.Error(logger).Log("msg", "Flag geo.type is incorrect", "type", geodbType)
 	}
 }
 
-func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddres string) {
+func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddres string, logger log.Logger) {
 	geodb, err := geoip2.Open(geodbPath)
 	if err != nil {
-		log.Println("[ERROR] Error opening GeoIp database file", err)
+		level.Error(logger).Log("msg", "Error opening GeoIp database file", "err", err)
 		return
 	}
 	defer geodb.Close()
 	ip := net.ParseIP(ipAddres)
 	if ip == nil {
-		log.Println("[ERROR] Error parsing ip address", ipAddres)
+		level.Error(logger).Log("msg", "Error parsing ip address", "ip", ipAddres)
 		return
 	}
 	record, err := geodb.City(ip)
 	if err != nil {
-		log.Println("[ERROR] Error getting location details", err)
+		level.Error(logger).Log("msg", "Error getting location details", "err", err)
 		return
 	}
 	returnValues.countyISOCode = record.Country.IsoCode
@@ -80,37 +79,37 @@ func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddres string) {
 	returnValues.cityName = record.City.Names[geoLang]
 }
 
-func getIPDetailsFromURL(returnValues *geoInfo, ipAddres string) {
+func getIPDetailsFromURL(returnValues *geoInfo, ipAddres string, logger log.Logger) {
 	// Timeout for get and read response body.
 	client := http.Client{
 		Timeout: time.Duration(geoTimeout) * time.Second,
 	}
 	response, err := client.Get(geoURL + ipAddres)
 	if err != nil {
-		log.Println("[ERROR] Error getting GeoIp URL", err)
+		level.Error(logger).Log("msg", "Error getting GeoIp URL", "err", err)
 		return
 	}
 	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Println("[ERROR] Error getting body from GeoIp URL", err)
+		level.Error(logger).Log("msg", "Error getting body from GeoIp URL", "err", err)
 		return
 	}
 	var parseData map[string]interface{}
 	err = json.Unmarshal(body, &parseData)
 	if err != nil {
-		log.Println("[ERROR] Error parsing json-encoded body from GeoIp URL", err)
+		level.Error(logger).Log("msg", "Error parsing json-encoded body from GeoIp URL", "err", err)
 		return
 	}
-	returnValues.countyISOCode = getMap(parseData, "country_code")
-	returnValues.countryName = getMap(parseData, "country_name")
-	returnValues.cityName = getMap(parseData, "city")
+	returnValues.countyISOCode = getMap(parseData, "country_code", logger)
+	returnValues.countryName = getMap(parseData, "country_name", logger)
+	returnValues.cityName = getMap(parseData, "city", logger)
 }
 
-func getMap(data map[string]interface{}, key string) string {
+func getMap(data map[string]interface{}, key string, logger log.Logger) string {
 	str, ok := data[key].(string)
 	if !ok {
-		log.Printf("[ERROR] Error for key %s value %s is not a string", key, str)
+		level.Error(logger).Log("msg", "Is not a string", "key", key, "value", str)
 	}
 	return str
 }
