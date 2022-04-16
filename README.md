@@ -134,7 +134,7 @@ To analyze IP addresses location using external API https://freegeoip.live:
 ./authlog_exporter --geo.type url
 ```
 
-Be aware that API has a limit of **10K requests per hour**.
+Be aware that API has a limit of requests per hour. See API documentation.
 
 ### Running tests
 
