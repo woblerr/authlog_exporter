@@ -16,19 +16,19 @@ var (
 	promPort          string
 	promEndpoint      string
 	promTLSConfigPath string
-	hideIP            bool
-	hideUser          bool
+	metricHideIP      bool
+	metricHideUser    bool
 )
 
 // SetExporterParams sets path for 'auth.log' from command line argument 'auth.log',
 // HTTP endpoint parameters from command line arguments 'port', 'endpoint' and 'tlsConfigPath'.
-func SetExporterParams(filePath, port, endpoint, tlsConfigPath string, _hideIP, _hideUser bool) {
+func SetExporterParams(filePath, port, endpoint, tlsConfigPath string, hideIP, hideUser bool) {
 	authlogPath = filePath
 	promPort = port
 	promEndpoint = endpoint
 	promTLSConfigPath = tlsConfigPath
-	hideIP = _hideIP
-	hideUser = _hideUser
+	metricHideIP = hideIP
+	metricHideUser = hideUser
 }
 
 // Start runs promhttp endpoind and parsing log process.

@@ -15,8 +15,10 @@ func TestSetExporterParams(t *testing.T) {
 		testPort          = "9991"
 		testEndpoit       = "/metrics"
 		testTLSConfigPath = ""
+		testHideIP        = false
+		testHideUser      = false
 	)
-	SetExporterParams(testLog, testPort, testEndpoit, testTLSConfigPath, false, false)
+	SetExporterParams(testLog, testPort, testEndpoit, testTLSConfigPath, testHideIP, testHideUser)
 	if testLog != authlogPath || testPort != promPort || testEndpoit != promEndpoint || testTLSConfigPath != promTLSConfigPath {
 		t.Errorf("\nVariables do not match,\nlog: %s, want: %s;\nport: %s, want: %s;\nendpoint: %s, want: %s;\nconfig: %s, want: %s",
 			testLog, authlogPath,
