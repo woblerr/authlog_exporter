@@ -54,6 +54,14 @@ func main() {
 			"geo.url",
 			"URL for geoIP database API.",
 		).Default("https://freegeoip.live/json/").String()
+		metricHideIP = kingpin.Flag(
+			"metric.hideip",
+			"Set this flag to hide IPs in the output and therefore drastically reduce the amount of metrics published.",
+		).Bool()
+		metricHideUser = kingpin.Flag(
+			"metric.hideuser",
+			"Set this flag to hide user accounts in the output and therefore drastically reduce the amount of metrics published.",
+		).Bool()
 	)
 	// Set logger config.
 	promlogConfig := &promlog.Config{}
@@ -84,7 +92,7 @@ func main() {
 		"version", version,
 	)
 	// Setup parameters for exporter.
-	promexporter.SetExporterParams(*authlogPath, *promPort, *promPath, *promTLSConfigFile)
+	promexporter.SetExporterParams(*authlogPath, *promPort, *promPath, *promTLSConfigFile, *metricHideIP, *metricHideUser)
 	level.Info(logger).Log(
 		"authlog", *authlogPath,
 		"mgs", "Use port and HTTP endpoint",

@@ -98,6 +98,8 @@ Flags:
       --geo.type=""         Type of geoIP database: db, url.
       --geo.url="https://freegeoip.live/json/"  
                             URL for geoIP database API.
+      --metric.hideip       Set this flag to hide IPs in the output and therefore drastically reduce the amount of metrics published.
+      --metric.hideuser     Set this flag to hide user accounts in the output and therefore drastically reduce the amount of metrics published.
       --log.level=info      Only log messages with the given severity or above. One of: [debug, info, warn, error]
       --log.format=logfmt   Output format of log messages. One of: [logfmt, json]
 ```

@@ -47,8 +47,12 @@ func parseLine(line *tail.Line, logger log.Logger) {
 		return
 	}
 	geoIPData := &geoInfo{}
-	parsedLog.Username = matches["user"]
-	parsedLog.IPAddress = matches["ipAddress"]
+	if !metricHideUser {
+		parsedLog.Username = matches["user"]
+	}
+	if !metricHideIP {
+		parsedLog.IPAddress = matches["ipAddress"]
+	}
 	// Get geo information.
 	if geodbIs {
 		if geodbType == "db" {
