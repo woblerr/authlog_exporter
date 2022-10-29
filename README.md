@@ -67,7 +67,7 @@ make build
 ./authlog_exporter <flags>
 ```
 
-By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9991/metrics. This means that the user who runs `authlog_exporter` should have read permission to file `/var/log/auth.log`. You can changed logfile location, port and endpoint by using the`--auth.log`, `--prom.port` and `--prom.endpoint` flags.
+By default, metrics will be collecting from `/var/log/auth.log` and will be available at http://localhost:9991/metrics. This means that the user who runs `authlog_exporter` should have read permission to file `/var/log/auth.log`. You can changed log file location, port and endpoint by using the`--auth.log`, `--prom.port` and `--prom.endpoint` flags.
 
 For geoIP analyze you need to specify `--geo.type` flag:
 * `db` - for local geoIP database file,
@@ -144,7 +144,7 @@ Be aware that API has a limit of requests per hour. See API documentation.
 make test
 ```
 
-For bulding and running on test log:
+For building and running on test log:
 
 ```bash
 make run-test
