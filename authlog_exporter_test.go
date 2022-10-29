@@ -3,7 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/big"
 	"net/http"
 	"os"
@@ -37,7 +37,7 @@ func TestMain(t *testing.T) {
 		t.Errorf("\nVariables do not match:\n%v\nwant:\n%v", resp.StatusCode, 200)
 	}
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf("\nGet error during read resp body:\n%v", err)
 	}
