@@ -2,7 +2,7 @@ package promexporter
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -90,7 +90,7 @@ func getIPDetailsFromURL(returnValues *geoInfo, ipAddres string, logger log.Logg
 		return
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		level.Error(logger).Log("msg", "Error getting body from GeoIp URL", "err", err)
 		return

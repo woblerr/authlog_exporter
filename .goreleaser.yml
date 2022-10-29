@@ -17,7 +17,7 @@ builds:
     main: .
 
 archives:
-  - id: pgbackrest_exporter
+  - id: authlog_exporter
     files:
       - LICENSE
     format: tar.gz

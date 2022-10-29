@@ -71,7 +71,7 @@ remove-service:
 docker-build:
 	@echo "Build $(APP_NAME) docker container"
 	@echo "Version $(BRANCH)-$(GIT_REV)"
-	docker build --pull -f Dockerfile --build-arg REPO_BUILD_TAG=$(BRANCH)-$(GIT_REV) --build-arg BACKREST_VERSION=$(BACKREST_VERSION) -t $(APP_NAME) .
+	docker build --pull -f Dockerfile --build-arg REPO_BUILD_TAG=$(BRANCH)-$(GIT_REV) -t $(APP_NAME) .
 
 .PHONY: docker-run
 docker-run:
