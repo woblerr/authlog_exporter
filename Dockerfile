@@ -11,8 +11,10 @@ RUN apk update \
         -ldflags "-X main.version=${REPO_BUILD_TAG}" \
         -o authlog_exporter authlog_exporter.go
 
-FROM scratch
+FROM alpine:3.16
 ARG REPO_BUILD_TAG
+RUN apk add --no-cache --update ca-certificates \
+    && rm -rf /var/cache/apk/*
 COPY --from=builder /go/src/github.com/woblerr/authlog_exporter/authlog_exporter /authlog_exporter
 EXPOSE 9991
 USER nobody
