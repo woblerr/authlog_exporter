@@ -4,7 +4,7 @@ import (
 	"regexp"
 
 	"github.com/go-kit/log"
-	"github.com/hpcloud/tail"
+	"github.com/nxadm/tail"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
