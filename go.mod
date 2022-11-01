@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/go-kit/log v0.1.0
-	github.com/hpcloud/tail v1.0.0
+	github.com/nxadm/tail v1.4.8
 	github.com/oschwald/geoip2-golang v1.5.0
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.29.0
@@ -34,7 +34,6 @@ require (
 	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/protobuf v1.26.0-rc.1 // indirect
-	gopkg.in/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
