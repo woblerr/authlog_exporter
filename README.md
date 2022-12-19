@@ -136,7 +136,7 @@ To analyze IP addresses location using external API https://reallyfreegeoip.org:
 ./authlog_exporter --geo.type url
 ```
 
-Be aware that API has a limit of requests per hour. See API documentation.
+Be aware that API may have a limit of requests per hour. See API documentation.
 
 ### Running tests
 
