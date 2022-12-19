@@ -53,7 +53,7 @@ func main() {
 		geodbURL = kingpin.Flag(
 			"geo.url",
 			"URL for geoIP database API.",
-		).Default("https://freegeoip.live/json/").String()
+		).Default("https://reallyfreegeoip.org/json/").String()
 		metricHideIP = kingpin.Flag(
 			"metric.hideip",
 			"Set this flag to hide IPs in the output and therefore drastically reduce the amount of metrics published.",

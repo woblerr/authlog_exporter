@@ -96,7 +96,7 @@ Flags:
       --geo.lang="en"       Output language format.
       --geo.timeout=2       Timeout in seconds for waiting response from geoIP database API.
       --geo.type=""         Type of geoIP database: db, url.
-      --geo.url="https://freegeoip.live/json/"  
+      --geo.url="https://reallyfreegeoip.org/json/"  
                             URL for geoIP database API.
       --metric.hideip       Set this flag to hide IPs in the output and therefore drastically reduce the amount of metrics published.
       --metric.hideuser     Set this flag to hide user accounts in the output and therefore drastically reduce the amount of metrics published.
@@ -130,7 +130,7 @@ authlog_events_total{cityName="Пекин",countryName="Китай",countyISOCod
 
 #### geoIP database API
 
-To analyze IP addresses location using external API https://freegeoip.live:
+To analyze IP addresses location using external API https://reallyfreegeoip.org:
 
 ```bash
 ./authlog_exporter --geo.type url
