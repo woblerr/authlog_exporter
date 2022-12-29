@@ -183,7 +183,7 @@ Manual register systemd service:
 cp authlog_exporter.service.template authlog_exporter.service
 ```
 
-In file `authlog_exporter.service` replace ***{PATH_TO_FILE}*** to full path to `authlog_exporter`.
+In file `authlog_exporter.service` replace ***/usr/bin*** to full path to `authlog_exporter`.
 
 ```bash
 sudo cp authlog_exporter.service /etc/systemd/system/authlog_exporter.service
@@ -227,4 +227,17 @@ docker run -d --restart=always \
   -u $(id -u):$(id -g) \
   authlog_exporter \
   --auth.log /log/auth.log
+```
+
+
+### RPM/DEB packages
+
+You can use the already prepared rpm/deb package to install the exporter. Only the authlog_exporter binary  and the service file are installed by package.
+
+For example:
+```bash
+rpm -ql authlog_exporter
+
+/etc/systemd/system/authlog_exporter.service
+/usr/bin/authlog_exporter
 ```
