@@ -20,7 +20,7 @@ func TestMain(t *testing.T) {
 	port := 50000 + int(n.Int64())
 	os.Args = []string{
 		"authlog_exporter",
-		"--prom.port=" + strconv.Itoa(port),
+		"--web.listen-address=:" + strconv.Itoa(port),
 		"--auth.log",
 		"./test_data/auth.log"}
 	finished := make(chan struct{})
