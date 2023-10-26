@@ -21,20 +21,14 @@ archives:
     files:
       - LICENSE
     format: tar.gz
-    name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    name_template: '{{ .Binary }}-{{ .Version }}-{{ if eq .Os "darwin" }}macos{{ else }}{{ .Os }}{{ end }}-{{ if eq .Arch "amd64" }}x86_64{{ else }}{{ .Arch }}{{ end }}'
     wrap_in_directory: true
-    replacements:
-      amd64: x86_64
-      darwin: macos
-
 
 nfpms:
   - id: authlog_exporter
     package_name: authlog_exporter
     builds:
       - authlog_exporter
-    replacements:
-      amd64: x86_64
     homepage: https://github.com/woblerr/authlog_exporter
     maintainer: Anton Kurochkin
     description: Prometheus exporter for collecting events from auth.log file with geoIP support
@@ -43,7 +37,7 @@ nfpms:
       - deb
       - rpm
     bindir: /usr/bin
-    file_name_template: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    file_name_template: '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ if eq .Arch "amd64" }}x86_64{{ else }}{{ .Arch }}{{ end }}'
     contents:
       - src: authlog_exporter.service.template
         dst: /etc/systemd/system/authlog_exporter.service

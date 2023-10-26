@@ -10,14 +10,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up go 1.18
-        uses: actions/setup-go@v2
+      - name: Set up go 1.20
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: "1.20"
         id: go
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Build and test
         run: |
@@ -25,15 +25,16 @@ jobs:
         env:
           GOFLAGS: "-mod=vendor"
 
-      - name: Install golangci-lint and goveralls
-        run: |
-          curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $GITHUB_WORKSPACE v1.50.1
-          GO111MODULE=off go get -u github.com/mattn/goveralls
-
       - name: Run linters
-        run: $GITHUB_WORKSPACE/golangci-lint run --out-format=github-actions
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.53.3
         env:
-          GOFLAGS: "-mod=vendor"
+          TZ: "Etc/UTC"
+
+      - name: Install goveralls
+        run: |
+          GO111MODULE=off go get -u github.com/mattn/goveralls
 
       - name: Submit coverage
         run: $(go env GOPATH)/bin/goveralls -service="github" -coverprofile=$GITHUB_WORKSPACE/coverage.out
@@ -41,11 +42,11 @@ jobs:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
@@ -97,16 +98,16 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env: 
-      goreleaser_version: "v1.13.1"
+      goreleaser_version: "v1.20.0"
     steps:
-      - name: Set up go 1.18
-        uses: actions/setup-go@v2
+      - name: Set up go 1.20
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: "1.20"
         id: go
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Get ref
         id: vars
@@ -114,18 +115,18 @@ jobs:
           echo ::set-output name=ref::$(echo ${GITHUB_REF} | cut -d'/' -f3)
 
       - name: Check GoReleaser config
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser
           version: ${{ env.goreleaser_version }}
-          args: check
+          args: check .goreleaser.yml
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v4
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         with:
           distribution: goreleaser
           version: ${{ env.goreleaser_version }}
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
