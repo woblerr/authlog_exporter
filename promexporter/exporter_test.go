@@ -5,26 +5,39 @@ import (
 
 	"github.com/go-kit/log"
 	"github.com/prometheus/common/promlog"
+	"github.com/prometheus/exporter-toolkit/web"
 )
 
 var logger = getLogger()
 
 func TestSetExporterParams(t *testing.T) {
 	var (
-		testLog           = "/test_data/auth.log"
-		testPort          = "9991"
-		testEndpoit       = "/metrics"
-		testTLSConfigPath = ""
-		testHideIP        = false
-		testHideUser      = false
+		testLog         = "/test_data/auth.log"
+		testFlagsConfig = web.FlagConfig{
+			WebListenAddresses: &([]string{":9991"}),
+			WebSystemdSocket:   valToPtr(bool(false)),
+			WebConfigFile:      valToPtr(string("")),
+		}
+		testEndpoint = "/metrics"
+		testHideIP   = false
+		testHideUser = false
 	)
-	SetExporterParams(testLog, testPort, testEndpoit, testTLSConfigPath, testHideIP, testHideUser)
-	if testLog != authlogPath || testPort != promPort || testEndpoit != promEndpoint || testTLSConfigPath != promTLSConfigPath {
-		t.Errorf("\nVariables do not match,\nlog: %s, want: %s;\nport: %s, want: %s;\nendpoint: %s, want: %s;\nconfig: %s, want: %s",
-			testLog, authlogPath,
-			testPort, promPort,
-			testEndpoit, promEndpoint,
-			testTLSConfigPath, promTLSConfigPath,
+	SetExporterParams(testLog, testEndpoint, testFlagsConfig, testHideIP, testHideUser)
+	if testFlagsConfig.WebListenAddresses != webFlagsConfig.WebListenAddresses ||
+		testFlagsConfig.WebSystemdSocket != webFlagsConfig.WebSystemdSocket ||
+		testFlagsConfig.WebConfigFile != webFlagsConfig.WebConfigFile ||
+		testEndpoint != webEndpoint ||
+		testHideIP != metricHideIP ||
+		testHideUser != metricHideUser {
+		t.Errorf("\nVariables do not match,\nlistenAddresses: %v, want: %v;\n"+
+			"systemSocket: %v, want: %v;\nwebConfig: %v, want: %v;\nendpoint: %s, want: %s"+
+			"\nhideIP: %v, want: %v;\nhideUser: %v, want: %v",
+			ptrToVal(testFlagsConfig.WebListenAddresses), ptrToVal(webFlagsConfig.WebListenAddresses),
+			ptrToVal(testFlagsConfig.WebSystemdSocket), ptrToVal(webFlagsConfig.WebSystemdSocket),
+			ptrToVal(testFlagsConfig.WebConfigFile), ptrToVal(webFlagsConfig.WebConfigFile),
+			testEndpoint, webEndpoint,
+			testHideIP, metricHideIP,
+			testHideUser, metricHideUser,
 		)
 	}
 }
@@ -42,4 +55,12 @@ func getLogger() log.Logger {
 		panic(err)
 	}
 	return promlog.New(promlogConfig)
+}
+
+func ptrToVal[T any](v *T) T {
+	return *v
+}
+
+func valToPtr[T any](v T) *T {
+	return &v
 }

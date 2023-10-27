@@ -6,12 +6,13 @@ import (
 	"path/filepath"
 	"syscall"
 
+	kingpin "github.com/alecthomas/kingpin/v2"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/common/promlog"
 	"github.com/prometheus/common/promlog/flag"
+	"github.com/prometheus/exporter-toolkit/web/kingpinflag"
 	"github.com/woblerr/authlog_exporter/promexporter"
-	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 var version = "unknown"
@@ -22,19 +23,12 @@ func main() {
 			"auth.log",
 			"Path to auth.log.",
 		).Default("/var/log/auth.log").String()
-		promPath = kingpin.Flag(
-			"prom.endpoint",
+		webPath = kingpin.Flag(
+			"web.endpoint",
 			"Endpoint used for metrics.",
 		).Default("/metrics").String()
-		promPort = kingpin.Flag(
-			"prom.port",
-			"Port for prometheus metrics to listen on.",
-		).Default("9991").String()
-		promTLSConfigFile = kingpin.Flag(
-			"prom.web-config",
-			"[EXPERIMENTAL] Path to config yaml file that can enable TLS or authentication.",
-		).Default("").String()
-		geodbPath = kingpin.Flag(
+		webAdditionalToolkitFlags = kingpinflag.AddFlags(kingpin.CommandLine, ":9991")
+		geodbPath                 = kingpin.Flag(
 			"geo.db",
 			"Path to geoIP database file.",
 		).Default("").String()
@@ -92,13 +86,14 @@ func main() {
 		"version", version,
 	)
 	// Setup parameters for exporter.
-	promexporter.SetExporterParams(*authlogPath, *promPort, *promPath, *promTLSConfigFile, *metricHideIP, *metricHideUser)
+	promexporter.SetExporterParams(*authlogPath, *webPath, *webAdditionalToolkitFlags, *metricHideIP, *metricHideUser)
 	level.Info(logger).Log(
+		"mgs", "Use exporter parameters",
 		"authlog", *authlogPath,
-		"mgs", "Use port and HTTP endpoint",
-		"port", *promPort,
-		"endpoint", *promPath,
-		"web-config", *promTLSConfigFile,
+		"endpoint", *webPath,
+		"config.file", *webAdditionalToolkitFlags.WebConfigFile,
+		"hideip", *metricHideIP,
+		"hideuser", *metricHideUser,
 	)
 	promexporter.SetGeodbPath(*geodbType, *geodbPath, *geodbLang, *geodbURL, *geodbTimeout, logger)
 	// Start exporter.

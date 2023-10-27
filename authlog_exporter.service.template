@@ -4,9 +4,9 @@ Description=authlog_exporter
 [Service]
 Type=simple
 Environment="AUTH_LOG_PATH=/var/log/auth.log"
-Environment="ENDPOINT=/metrics"
-Environment="PORT=9991"
-ExecStart=/usr/bin/authlog_exporter --auth.log=${AUTH_LOG_PATH} --prom.endpoint=${ENDPOINT} --prom.port=${PORT}
+Environment="EXPORTER_ENDPOINT=/metrics"
+Environment="EXPORTER_PORT=9991"
+ExecStart=/usr/bin/authlog_exporter --auth.log=${AUTH_LOG_PATH} --web.endpoint=${EXPORTER_ENDPOINT} --web.listen-address=:${EXPORTER_PORT}
 Restart=always
 RestartSec=5s
 
