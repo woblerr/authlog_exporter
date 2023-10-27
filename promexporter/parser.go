@@ -32,7 +32,7 @@ type authLogLine struct {
 }
 
 func parseLine(line *tail.Line, logger log.Logger) {
-	parsedLog := &authLogLine{}
+	parsedLog := authLogLine{}
 	matches := make(map[string]string)
 	// Find the type of log and parse it.
 	for t, re := range authLineRegexps {
@@ -46,26 +46,22 @@ func parseLine(line *tail.Line, logger log.Logger) {
 	if len(matches) == 0 {
 		return
 	}
-	geoIPData := &geoInfo{}
-	if !metricHideUser {
-		parsedLog.Username = matches["user"]
-	}
-	if !metricHideIP {
-		parsedLog.IPAddress = matches["ipAddress"]
-	}
+	parsedLog.Username = matches["user"]
+	parsedLog.IPAddress = matches["ipAddress"]
+	geoIPData := geoInfo{}
 	// Get geo information.
 	if geodbIs {
 		if geodbType == "db" {
-			getIPDetailsFromLocalDB(geoIPData, parsedLog.IPAddress, logger)
+			getIPDetailsFromLocalDB(&geoIPData, parsedLog.IPAddress, logger)
 		} else {
-			getIPDetailsFromURL(geoIPData, parsedLog.IPAddress, logger)
+			getIPDetailsFromURL(&geoIPData, parsedLog.IPAddress, logger)
 		}
 	}
 	// Add metric.
 	authVentsMetric.WithLabelValues(
 		parsedLog.Type,
-		parsedLog.Username,
-		parsedLog.IPAddress,
+		hideValue(metricHideUser, parsedLog.Username),
+		hideValue(metricHideIP, parsedLog.IPAddress),
 		geoIPData.countyISOCode,
 		geoIPData.countryName,
 		geoIPData.cityName,
@@ -82,4 +78,11 @@ func getMatches(line string, re *regexp.Regexp) map[string]string {
 		}
 	}
 	return results
+}
+
+func hideValue(boolValue bool, value string) string {
+	if boolValue {
+		return ""
+	}
+	return value
 }

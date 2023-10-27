@@ -121,3 +121,40 @@ func TestGetMatches(t *testing.T) {
 		})
 	}
 }
+
+func TestHideValue(t *testing.T) {
+	type args struct {
+		value     string
+		boolValue bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			"hideTrue",
+			args{
+				value:     "test",
+				boolValue: true,
+			},
+			"",
+		},
+		{
+			"hideFalse",
+			args{
+				value:     "test",
+				boolValue: false,
+			},
+			"test",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := hideValue(tt.args.boolValue, tt.args.value); got != tt.want {
+				t.Errorf("hideValue() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
