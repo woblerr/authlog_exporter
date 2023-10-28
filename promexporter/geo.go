@@ -64,7 +64,7 @@ func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddress string, logger log
 		return
 	}
 	defer geodb.Close()
-	level.Debug(logger).Log("msg", "Parse IP", "ip", string(ipAddress))
+	level.Debug(logger).Log("msg", "Parse IP", "ip", ipAddress)
 	ip := net.ParseIP(ipAddress)
 	if ip == nil {
 		level.Error(logger).Log("msg", "Error parsing IP address", "ip", ipAddress)
