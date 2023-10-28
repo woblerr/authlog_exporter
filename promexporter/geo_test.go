@@ -102,7 +102,7 @@ func TestGetIPDetailsFromURL(t *testing.T) {
 	defer srv.Close()
 	type args struct {
 		returnValues *geoInfo
-		ipAddres     string
+		ipAddress    string
 	}
 
 	tests := []struct {
@@ -123,7 +123,7 @@ func TestGetIPDetailsFromURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			geoURL = tt.testGeoURL
-			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddres, logger)
+			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddress, logger)
 			if !reflect.DeepEqual(tt.args.returnValues, tt.want) {
 				t.Errorf("\ngetIPDetailsFromURL() =\n%v,\nwant=\n%v", tt.args.returnValues, tt.want)
 			}
@@ -136,7 +136,7 @@ func TestGetIPDetailsFromURLErrors(t *testing.T) {
 	defer srv.Close()
 	type args struct {
 		returnValues *geoInfo
-		ipAddres     string
+		ipAddress    string
 	}
 	reqArgs := args{
 		&geoInfo{"", "", ""},
@@ -174,7 +174,7 @@ func TestGetIPDetailsFromURLErrors(t *testing.T) {
 			geoURL = tt.testGeoURL
 			out := &bytes.Buffer{}
 			lc := log.NewLogfmtLogger(out)
-			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddres, lc)
+			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddress, lc)
 			if !strings.Contains(out.String(), tt.testText) {
 				t.Errorf("\nVariable do not match:\n%s\nwant:\n%s", tt.testText, out.String())
 			}
@@ -185,7 +185,7 @@ func TestGetIPDetailsFromURLErrors(t *testing.T) {
 func TestGetIPDetailsFromLocalDB(t *testing.T) {
 	type args struct {
 		returnValues *geoInfo
-		ipAddres     string
+		ipAddress    string
 	}
 	geoLang = "en"
 	tests := []struct {
@@ -206,7 +206,7 @@ func TestGetIPDetailsFromLocalDB(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			geodbPath = getFullPath(tt.testGeoFile)
-			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddres, logger)
+			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddress, logger)
 			if !reflect.DeepEqual(tt.args.returnValues, tt.want) {
 				t.Errorf("\ngetIPDetailsFromURL() =\n%v,\nwant=\n%v", tt.args.returnValues, tt.want)
 			}
@@ -217,7 +217,7 @@ func TestGetIPDetailsFromLocalDB(t *testing.T) {
 func TestGetIPDetailsFromLocalDBErrors(t *testing.T) {
 	type args struct {
 		returnValues *geoInfo
-		ipAddres     string
+		ipAddress    string
 	}
 	tests := []struct {
 		name        string
@@ -239,7 +239,7 @@ func TestGetIPDetailsFromLocalDBErrors(t *testing.T) {
 				"12.123.12.",
 			},
 			"../test_data/geolite2_test.mmdb",
-			"Error parsing ip address",
+			"Error parsing IP address",
 		},
 	}
 	for _, tt := range tests {
@@ -247,7 +247,7 @@ func TestGetIPDetailsFromLocalDBErrors(t *testing.T) {
 			geodbPath = getFullPath(tt.testGeoFile)
 			out := &bytes.Buffer{}
 			lc := log.NewLogfmtLogger(out)
-			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddres, lc)
+			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddress, lc)
 			if !strings.Contains(out.String(), tt.testText) {
 				t.Errorf("\nVariable do not match:\n%s\nwant:\n%s", tt.testText, out.String())
 			}

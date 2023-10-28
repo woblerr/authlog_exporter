@@ -57,16 +57,17 @@ func checkGeoDBFlags(logger log.Logger) {
 	}
 }
 
-func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddres string, logger log.Logger) {
+func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddress string, logger log.Logger) {
 	geodb, err := geoip2.Open(geodbPath)
 	if err != nil {
 		level.Error(logger).Log("msg", "Error opening GeoIp database file", "err", err)
 		return
 	}
 	defer geodb.Close()
-	ip := net.ParseIP(ipAddres)
+	level.Debug(logger).Log("msg", "Parse IP", "ip", ipAddress)
+	ip := net.ParseIP(ipAddress)
 	if ip == nil {
-		level.Error(logger).Log("msg", "Error parsing ip address", "ip", ipAddres)
+		level.Error(logger).Log("msg", "Error parsing IP address", "ip", ipAddress)
 		return
 	}
 	record, err := geodb.City(ip)
@@ -79,18 +80,20 @@ func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddres string, logger log.
 	returnValues.cityName = record.City.Names[geoLang]
 }
 
-func getIPDetailsFromURL(returnValues *geoInfo, ipAddres string, logger log.Logger) {
+func getIPDetailsFromURL(returnValues *geoInfo, ipAddress string, logger log.Logger) {
 	// Timeout for get and read response body.
 	client := http.Client{
 		Timeout: time.Duration(geoTimeout) * time.Second,
 	}
-	response, err := client.Get(geoURL + ipAddres)
+	level.Debug(logger).Log("msg", "Get IP details from url", "url", geoURL+ipAddress)
+	response, err := client.Get(geoURL + ipAddress)
 	if err != nil {
 		level.Error(logger).Log("msg", "Error getting GeoIp URL", "err", err)
 		return
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
+	level.Debug(logger).Log("msg", "Response body", "body", string(body))
 	if err != nil {
 		level.Error(logger).Log("msg", "Error getting body from GeoIp URL", "err", err)
 		return
