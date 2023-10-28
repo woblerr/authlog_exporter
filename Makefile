@@ -11,7 +11,7 @@ all: run-test docker-run-test
 .PHONY: test
 test:
 	@echo "Run tests for $(APP_NAME)"
-	go test -mod=vendor -timeout=60s -count 1  ./...
+	TZ="Etc/UTC" go test -mod=vendor -timeout=60s -count 1  ./...
 
 .PHONY: build
 build:
