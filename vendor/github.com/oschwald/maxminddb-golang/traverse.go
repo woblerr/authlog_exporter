@@ -14,11 +14,10 @@ type netNode struct {
 
 // Networks represents a set of subnets that we are iterating over.
 type Networks struct {
-	reader   *Reader
-	nodes    []netNode // Nodes we still have to visit.
-	lastNode netNode
-	err      error
-
+	err                 error
+	reader              *Reader
+	nodes               []netNode
+	lastNode            netNode
 	skipAliasedNetworks bool
 }
 
@@ -27,7 +26,7 @@ var (
 	allIPv6 = &net.IPNet{IP: make(net.IP, 16), Mask: net.CIDRMask(0, 128)}
 )
 
-// NetworksOption are options for Networks and NetworksWithin
+// NetworksOption are options for Networks and NetworksWithin.
 type NetworksOption func(*Networks)
 
 // SkipAliasedNetworks is an option for Networks and NetworksWithin that
@@ -96,6 +95,13 @@ func (r *Reader) NetworksWithin(network *net.IPNet, options ...NetworksOption) *
 	}
 
 	pointer, bit := r.traverseTree(ip, 0, uint(prefixLength))
+
+	// We could skip this when bit >= prefixLength if we assume that the network
+	// passed in is in canonical form. However, given that this may not be the
+	// case, it is safest to always take the mask. If this is hot code at some
+	// point, we could eliminate the allocation of the net.IPMask by zeroing
+	// out the bits in ip directly.
+	ip = ip.Mask(net.CIDRMask(bit, len(ip)*8))
 	networks.nodes = []netNode{
 		{
 			ip:      ip,
@@ -159,7 +165,7 @@ func (n *Networks) Next() bool {
 // Network returns the current network or an error if there is a problem
 // decoding the data for the network. It takes a pointer to a result value to
 // decode the network's data into.
-func (n *Networks) Network(result interface{}) (*net.IPNet, error) {
+func (n *Networks) Network(result any) (*net.IPNet, error) {
 	if n.err != nil {
 		return nil, n.err
 	}
