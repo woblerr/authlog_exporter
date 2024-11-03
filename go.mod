@@ -7,7 +7,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/nxadm/tail v1.4.11
 	github.com/oschwald/geoip2-golang v1.11.0
-	github.com/prometheus/client_golang v1.19.0
+	github.com/prometheus/client_golang v1.19.1
 	github.com/prometheus/common v0.54.0
 	github.com/prometheus/exporter-toolkit v0.11.0
 )
