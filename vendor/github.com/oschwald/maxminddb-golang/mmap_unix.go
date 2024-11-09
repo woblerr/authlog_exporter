@@ -1,4 +1,5 @@
-// +build !windows,!appengine,!plan9
+//go:build !windows && !appengine && !plan9 && !js && !wasip1 && !wasi
+// +build !windows,!appengine,!plan9,!js,!wasip1,!wasi
 
 package maxminddb
 
