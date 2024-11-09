@@ -8,7 +8,7 @@ RUN apt-get -y update \
         libmaxminddb-dev \
         mmdb-bin \
         cpanminus \
-    && cpanm \
+    && cpanm --notest \
         MaxMind::DB::Common \
         MaxMind::DB::Writer \
     && apt-get autoremove -y \
