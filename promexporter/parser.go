@@ -12,11 +12,16 @@ import (
 var (
 	authLinePrefix  = "^(?P<date>[A-Z][a-z]{2}\\s+\\d{1,2}) (?P<time>(\\d{2}:?){3}) (?P<host>[a-zA-Z0-9_\\-\\.]+) (?P<ident>[a-zA-Z0-9_\\-]+)(\\[(?P<pid>\\d+)\\])?: "
 	authLineRegexps = map[string]*regexp.Regexp{
-		"authAccepted":     regexp.MustCompile(authLinePrefix + "Accepted (password|publickey) for (?P<user>.*) from (?P<ipAddress>.*) port"),
-		"authFailed":       regexp.MustCompile(authLinePrefix + "Failed (password|publickey) for (invalid user )?(?P<user>.*) from (?P<ipAddress>.*) port"),
-		"invalidUser":      regexp.MustCompile(authLinePrefix + "Invalid user (?P<user>.*) from (?P<ipAddress>.*) port"),
-		"notAllowedUser":   regexp.MustCompile(authLinePrefix + "User (?P<user>.*) from (?P<ipAddress>.*) not allowed because"),
-		"connectionClosed": regexp.MustCompile(authLinePrefix + "Connection closed by authenticating user (?P<user>.*) (?P<ipAddress>.*) port"),
+		"authAccepted":                  regexp.MustCompile(authLinePrefix + "Accepted (password|publickey) for (?P<user>.*) from (?P<ipAddress>.*) port"),
+		"authFailed":                    regexp.MustCompile(authLinePrefix + "Failed (password|publickey) for (invalid user )?(?P<user>.*) from (?P<ipAddress>.*) port"),
+		"invalidUser":                   regexp.MustCompile(authLinePrefix + "Invalid user (?P<user>.*) from (?P<ipAddress>.*) port"),
+		"notAllowedUser":                regexp.MustCompile(authLinePrefix + "User (?P<user>.*) from (?P<ipAddress>.*) not allowed because"),
+		"connectionClosed":              regexp.MustCompile(authLinePrefix + "Connection closed by authenticating user (?P<user>.*) (?P<ipAddress>.*) port"),
+		"sudoIncorrectPasswordAttempts": regexp.MustCompile(authLinePrefix + "[ ]+(?P<user>.*) : (?P<attempts>\\d+) incorrect password attempts ; TTY=(?P<tty>[^ ]+) ; PWD=(?P<pwd>.+) ; USER=(?P<user_as>.*) ; COMMAND=(?P<command>.*)"),
+		"sudoNotInSudoers":              regexp.MustCompile(authLinePrefix + "[ ]+(?P<user>.*) : user NOT in sudoers ; TTY=(?P<tty>[^ ]+) ; PWD=(?P<pwd>.+) ; USER=(?P<user_as>.*) ; COMMAND=(?P<command>.*)"),
+		"sudoSucceeded":                 regexp.MustCompile(authLinePrefix + "[ ]+(?P<user>.*) : TTY=(?P<tty>[^ ]+) ; PWD=(?P<pwd>.+) ; USER=(?P<user_as>.*) ; COMMAND=(?P<command>.*)"),
+		"suSucceeded":                   regexp.MustCompile(authLinePrefix + "\\(to (?P<user_as>.*)\\) (?P<user>.*) on (?P<tty>[^ ]+)"),
+		"suFailed":                      regexp.MustCompile(authLinePrefix + "FAILED SU \\(to (?P<user_as>.*)\\) (?P<user>.*) on (?P<tty>[^ ]+)"),
 	}
 	authVentsMetric = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "authlog_events_total",
