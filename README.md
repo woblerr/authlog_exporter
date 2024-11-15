@@ -55,6 +55,11 @@ authlog_events_total{cityName="Beijing",countryName="China",countyISOCode="CN",e
 |invalidUser|`Invalid user (?P<user>.*) from (?P<ipAddress>.*) port`|
 |notAllowedUser|`User (?P<user>.*) from (?P<ipAddress>.*) not allowed because`|
 |connectionClosed|`Connection closed by authenticating user (?P<user>.*) (?P<ipAddress>.*) port`|
+|sudoIncorrectPasswordAttempts|`[ ]+(?P<user>.*) : (?P<attempts>\\d+) incorrect password attempts ; TTY=(?P<tty>[^ ]+) ; PWD=(?P<pwd>.+) ; USER=(?P<user_as>.*) ; COMMAND=(?P<command>.*)`|
+|sudoNotInSudoers|`[ ]+(?P<user>.*) : user NOT in sudoers ; TTY=(?P<tty>[^ ]+) ; PWD=(?P<pwd>.+) ; USER=(?P<user_as>.*) ; COMMAND=(?P<command>.*)`|
+|sudoSucceeded|`[ ]+(?P<user>.*) : TTY=(?P<tty>[^ ]+) ; PWD=(?P<pwd>.+) ; USER=(?P<user_as>.*) ; COMMAND=(?P<command>.*)`|
+|suSucceeded|`\\(to (?P<user_as>.*)\\) (?P<user>.*) on (?P<tty>[^ ]+)`|
+|suFailed|`FAILED SU \\(to (?P<user_as>.*)\\) (?P<user>.*) on (?P<tty>[^ ]+)`|
 
 ## Getting Started
 
