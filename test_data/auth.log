@@ -63,3 +63,15 @@ Aug 30 15:11:35 hostname sshd[11944]: pam_unix(sshd:auth): authentication failur
 Aug 30 15:11:36 hostname sshd[11944]: Failed password for invalid user root from 123.123.12.12 port 46680 ssh2
 Apr 30 15:25:05 hostname sshd[11947]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=123.123.12.123  user=root
 Apr 30 15:25:06 hostname sshd[11947]: Failed password for root from 123.123.12.123 port 35449 ssh2
+Apr 30 15:35:06 hostname sudo: pam_unix(sudo:auth): authentication failure; logname=testuser uid=1000 euid=0 tty=/dev/pts/0 ruser=testuser rhost=  user=testuser
+Apr 30 15:35:33 hostname sudo:  testuser : 3 incorrect password attempts ; TTY=pts/0 ; PWD=/home/testuser ; USER=root ; COMMAND=/bin/ls
+Apr 30 15:40:33 hostname sudo: testuser : user NOT in sudoers ; TTY=pts/0 ; PWD=/home/testuser ; USER=root ; COMMAND=/bin/ls
+Apr 30 16:47:24 hostname sudo:     root : TTY=pts/0 ; PWD=/home/testuser ; USER=root ; COMMAND=/bin/su
+Apr 30 16:47:24 hostname sudo: pam_unix(sudo:session): session opened for user root by testuser(uid=0)
+Apr 30 16:47:24 hostname su: (to root) testuser on pts/0
+Apr 30 16:47:24 hostname su: pam_unix(su:session): session opened for user root by testuser(uid=0)
+Apr 30 16:52:59 hostname su: pam_unix(su:auth): authentication failure; logname=testuser uid=1000 euid=0 tty=pts/0 ruser=testuser rhost=  user=root
+Apr 30 16:53:02 hostname su: FAILED SU (to root) testuser on pts/0
+Apr 30 17:52:46 hostname sudo:     root : TTY=pts/0 ; PWD=/home/testuser ; USER=root ; COMMAND=/bin/ls
+Apr 30 17:52:46 hostname sudo: pam_unix(sudo:session): session opened for user root by testuser(uid=0)
+Apr 30 17:52:46 hostname sudo: pam_unix(sudo:session): session closed for user root
