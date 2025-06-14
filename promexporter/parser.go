@@ -1,9 +1,9 @@
 package promexporter
 
 import (
+	"log/slog"
 	"regexp"
 
-	"github.com/go-kit/log"
 	"github.com/nxadm/tail"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -36,7 +36,7 @@ type authLogLine struct {
 	IPAddress string
 }
 
-func parseLine(line *tail.Line, logger log.Logger) {
+func parseLine(line *tail.Line, logger *slog.Logger) {
 	parsedLog := authLogLine{}
 	matches := make(map[string]string)
 	// Find the type of log and parse it.

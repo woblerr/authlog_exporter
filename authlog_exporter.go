@@ -1,16 +1,15 @@
 package main
 
 import (
+	"log/slog"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
 
 	kingpin "github.com/alecthomas/kingpin/v2"
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
-	"github.com/prometheus/common/promlog"
-	"github.com/prometheus/common/promlog/flag"
+	"github.com/prometheus/common/promslog"
+	"github.com/prometheus/common/promslog/flag"
 	"github.com/prometheus/exporter-toolkit/web/kingpinflag"
 	"github.com/woblerr/authlog_exporter/promexporter"
 )
@@ -58,9 +57,8 @@ func main() {
 		).Bool()
 	)
 	// Set logger config.
-	promlogConfig := &promlog.Config{}
-	// Add flags log.level and log.format from promlog package.
-	flag.AddFlags(kingpin.CommandLine, promlogConfig)
+	promslogConfig := &promslog.Config{}
+	flag.AddFlags(kingpin.CommandLine, promslogConfig)
 	// Add short help flag.
 	kingpin.HelpFlag.Short('h')
 	// Load command line arguments.
@@ -70,25 +68,25 @@ func main() {
 	// Catch  listed signals.
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	// Set logger.
-	logger := promlog.New(promlogConfig)
+	logger := promslog.New(promslogConfig)
 	// Method invoked upon seeing signal.
-	go func(logger log.Logger) {
+	go func(logger *slog.Logger) {
 		s := <-sigs
-		level.Warn(logger).Log(
-			"msg", "Stopping exporter",
+		logger.Warn(
+			"Stopping exporter",
 			"name", filepath.Base(os.Args[0]),
 			"signal", s)
 		os.Exit(1)
 	}(logger)
-	level.Info(logger).Log(
-		"msg", "Starting exporter",
+	logger.Info(
+		"Starting exporter",
 		"name", filepath.Base(os.Args[0]),
 		"version", version,
 	)
 	// Setup parameters for exporter.
 	promexporter.SetExporterParams(*authlogPath, *webPath, *webAdditionalToolkitFlags, *metricHideIP, *metricHideUser)
-	level.Info(logger).Log(
-		"mgs", "Use exporter parameters",
+	logger.Info(
+		"Use exporter parameters",
 		"authlog", *authlogPath,
 		"endpoint", *webPath,
 		"config.file", *webAdditionalToolkitFlags.WebConfigFile,

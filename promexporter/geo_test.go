@@ -2,6 +2,7 @@ package promexporter
 
 import (
 	"bytes"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -9,8 +10,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/go-kit/log"
 )
 
 func TestSetGeodbPath(t *testing.T) {
@@ -50,7 +49,7 @@ func TestSetGeodbPath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
-			lc := log.NewLogfmtLogger(out)
+			lc := slog.New(slog.NewTextHandler(out, &slog.HandlerOptions{Level: slog.LevelDebug}))
 			SetGeodbPath(
 				tt.args.geoType,
 				tt.args.filePath,
@@ -173,7 +172,7 @@ func TestGetIPDetailsFromURLErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			geoURL = tt.testGeoURL
 			out := &bytes.Buffer{}
-			lc := log.NewLogfmtLogger(out)
+			lc := slog.New(slog.NewTextHandler(out, &slog.HandlerOptions{Level: slog.LevelDebug}))
 			getIPDetailsFromURL(tt.args.returnValues, tt.args.ipAddress, lc)
 			if !strings.Contains(out.String(), tt.testText) {
 				t.Errorf("\nVariable do not match:\n%s\nwant:\n%s", tt.testText, out.String())
@@ -246,7 +245,7 @@ func TestGetIPDetailsFromLocalDBErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			geodbPath = getFullPath(tt.testGeoFile)
 			out := &bytes.Buffer{}
-			lc := log.NewLogfmtLogger(out)
+			lc := slog.New(slog.NewTextHandler(out, &slog.HandlerOptions{Level: slog.LevelDebug}))
 			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddress, lc)
 			if !strings.Contains(out.String(), tt.testText) {
 				t.Errorf("\nVariable do not match:\n%s\nwant:\n%s", tt.testText, out.String())

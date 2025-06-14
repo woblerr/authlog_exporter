@@ -1,12 +1,11 @@
 package promexporter
 
 import (
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/nxadm/tail"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/exporter-toolkit/web"
@@ -35,8 +34,8 @@ func SetExporterParams(filePath, endpoint string, flagsConfig web.FlagConfig, hi
 }
 
 // Start runs promhttp endpoind and parsing log process.
-func Start(logger log.Logger) {
-	go func(logger log.Logger) {
+func Start(logger *slog.Logger) {
+	go func(logger *slog.Logger) {
 		http.Handle(webEndpoint, promhttp.Handler())
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(`<html>
@@ -51,7 +50,7 @@ func Start(logger log.Logger) {
 			ReadHeaderTimeout: 5 * time.Second,
 		}
 		if err := web.ListenAndServe(server, &webFlagsConfig, logger); err != nil {
-			level.Error(logger).Log("msg", "Run web endpoint failed", "err", err)
+			logger.Error("Run web endpoint failed", "err", err)
 			os.Exit(1)
 		}
 	}(logger)
@@ -60,7 +59,7 @@ func Start(logger log.Logger) {
 		ReOpen:    true,
 		MustExist: true})
 	if err != nil {
-		level.Error(logger).Log("msg", "Open log file failed", "err", err)
+		logger.Error("Open log file failed", "err", err)
 		os.Exit(1)
 	}
 	for line := range t.Lines {
