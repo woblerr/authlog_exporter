@@ -29,19 +29,25 @@ func TestMain(t *testing.T) {
 		close(finished)
 	}()
 	time.Sleep(time.Second)
-	resp, err := http.Get(fmt.Sprintf("http://localhost:%d/metrics", port))
-	if err != nil {
-		t.Errorf("\nGet error during GET:\n%v", err)
+	urlList := []string{
+		fmt.Sprintf("http://localhost:%d/metrics", port),
+		fmt.Sprintf("http://localhost:%d/", port),
 	}
-	if resp.StatusCode != 200 {
-		t.Errorf("\nVariables do not match:\n%v\nwant:\n%v", resp.StatusCode, 200)
-	}
-	defer resp.Body.Close()
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		t.Errorf("\nGet error during read resp body:\n%v", err)
-	}
-	if string(b) == "" {
-		t.Errorf("\nGet zero body:\n%s", string(b))
+	for _, url := range urlList {
+		resp, err := http.Get(url)
+		if err != nil {
+			t.Errorf("\nGet error during GET:\n%v", err)
+		}
+		if resp.StatusCode != 200 {
+			t.Errorf("\nGet bad response code for %s:\n%v\nwant:\n%v", url, resp.StatusCode, 200)
+		}
+		defer resp.Body.Close()
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Errorf("\nGet error during read resp body for %s:\n%v", url, err)
+		}
+		if string(b) == "" {
+			t.Errorf("\nGet zero body for %s:\n%s", url, string(b))
+		}
 	}
 }

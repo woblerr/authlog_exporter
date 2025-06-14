@@ -8,13 +8,16 @@ import (
 	"syscall"
 
 	kingpin "github.com/alecthomas/kingpin/v2"
+	"github.com/prometheus/client_golang/prometheus"
+	version_collector "github.com/prometheus/client_golang/prometheus/collectors/version"
 	"github.com/prometheus/common/promslog"
 	"github.com/prometheus/common/promslog/flag"
+	"github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web/kingpinflag"
 	"github.com/woblerr/authlog_exporter/promexporter"
 )
 
-var version = "unknown"
+const exporterName = "authlog_exporter"
 
 func main() {
 	var (
@@ -23,8 +26,8 @@ func main() {
 			"Path to auth.log.",
 		).Default("/var/log/auth.log").String()
 		webPath = kingpin.Flag(
-			"web.endpoint",
-			"Endpoint used for metrics.",
+			"web.telemetry-path",
+			"Path under which to expose metrics.",
 		).Default("/metrics").String()
 		webAdditionalToolkitFlags = kingpinflag.AddFlags(kingpin.CommandLine, ":9991")
 		geodbPath                 = kingpin.Flag(
@@ -59,6 +62,7 @@ func main() {
 	// Set logger config.
 	promslogConfig := &promslog.Config{}
 	flag.AddFlags(kingpin.CommandLine, promslogConfig)
+	kingpin.Version(version.Print(exporterName))
 	// Add short help flag.
 	kingpin.HelpFlag.Short('h')
 	// Load command line arguments.
@@ -81,8 +85,9 @@ func main() {
 	logger.Info(
 		"Starting exporter",
 		"name", filepath.Base(os.Args[0]),
-		"version", version,
+		"version", version.Info(),
 	)
+	logger.Info("Build context", "build_context", version.BuildContext())
 	// Setup parameters for exporter.
 	promexporter.SetExporterParams(*authlogPath, *webPath, *webAdditionalToolkitFlags, *metricHideIP, *metricHideUser)
 	logger.Info(
@@ -93,7 +98,9 @@ func main() {
 		"hideip", *metricHideIP,
 		"hideuser", *metricHideUser,
 	)
+	// Exporter build info metric.
+	prometheus.MustRegister(version_collector.NewCollector(exporterName))
 	promexporter.SetGeodbPath(*geodbType, *geodbPath, *geodbLang, *geodbURL, *geodbTimeout, logger)
 	// Start exporter.
-	promexporter.Start(logger)
+	promexporter.Start(version.Info(), logger)
 }

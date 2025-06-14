@@ -21,7 +21,7 @@ var (
 
 // SetExporterParams sets path for 'auth.log' from command line argument 'auth.log',
 // HTTP endpoint parameters from command line arguments:
-// 'web.endpoint',
+// 'web.telemetry-path',
 // 'web.listen-address',
 // 'web.config.file',
 // 'web.systemd-socket' (Linux only)'.
@@ -34,18 +34,32 @@ func SetExporterParams(filePath, endpoint string, flagsConfig web.FlagConfig, hi
 }
 
 // Start runs promhttp endpoind and parsing log process.
-func Start(logger *slog.Logger) {
+func Start(version string, logger *slog.Logger) {
 	go func(logger *slog.Logger) {
+		if webEndpoint == "" {
+			logger.Error("Metric endpoint is empty", "endpoint", webEndpoint)
+		}
 		http.Handle(webEndpoint, promhttp.Handler())
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(`<html>
-			<head><title>AuthLog exporter</title></head>
-			<body>
-			<h1>AuthLog exporter</h1>
-			<p><a href='` + webEndpoint + `'>Metrics</a></p>
-			</body>
-			</html>`))
-		})
+		if webEndpoint != "/" {
+			landingConfig := web.LandingConfig{
+				Name:        "AuthLog exporter",
+				Description: "Prometheus exporter for AuthLog",
+				HeaderColor: "#476b6b",
+				Version:     version,
+				Links: []web.LandingLinks{
+					{
+						Address: webEndpoint,
+						Text:    "Metrics",
+					},
+				},
+			}
+			landingPage, err := web.NewLandingPage(landingConfig)
+			if err != nil {
+				logger.Error("Error creating landing page", "err", err)
+				os.Exit(1)
+			}
+			http.Handle("/", landingPage)
+		}
 		server := &http.Server{
 			ReadHeaderTimeout: 5 * time.Second,
 		}
