@@ -86,11 +86,154 @@ func TestGetMap(t *testing.T) {
 				"city",
 			},
 			""},
+		{"existKeyButNotString",
+			args{
+				map[string]interface{}{"count": 123},
+				"count",
+			},
+			""},
+		{"existKeyButNilValue",
+			args{
+				map[string]interface{}{"value": nil},
+				"value",
+			},
+			""},
+		{"existKeyButBoolValue",
+			args{
+				map[string]interface{}{"flag": true},
+				"flag",
+			},
+			""},
+		{"existKeyButFloatValue",
+			args{
+				map[string]interface{}{"rate": 3.14},
+				"rate",
+			},
+			""},
+		{"existKeyButSliceValue",
+			args{
+				map[string]interface{}{"items": []string{"a", "b"}},
+				"items",
+			},
+			""},
+		{"existKeyButMapValue",
+			args{
+				map[string]interface{}{"nested": map[string]string{"key": "value"}},
+				"nested",
+			},
+			""},
+		{"emptyStringValue",
+			args{
+				map[string]interface{}{"empty": ""},
+				"empty",
+			},
+			""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getMap(tt.args.data, tt.args.key, logger); got != tt.want {
 				t.Errorf("\ngetMap() =\n%v,\nwant=\n%v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetMapErrorLogging(t *testing.T) {
+	defaultErrorText := "Is not a string"
+	type args struct {
+		data      map[string]interface{}
+		key       string
+		wantError bool
+		wantText  string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"existKeyButNotStringLogsError",
+			args{
+				map[string]interface{}{"count": 123},
+				"count",
+				true,
+				defaultErrorText,
+			}},
+		{"existKeyButNilValueLogsError",
+			args{
+				map[string]interface{}{"value": nil},
+				"value",
+				true,
+				defaultErrorText,
+			}},
+		{"validStringNoError",
+			args{
+				map[string]interface{}{"country": "US"},
+				"country",
+				false,
+				"",
+			}},
+		{"nonExistentKeyNoError",
+			args{
+				map[string]interface{}{"country": "US"},
+				"city",
+				false,
+				"",
+			}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out := &bytes.Buffer{}
+			lc := slog.New(slog.NewTextHandler(out, &slog.HandlerOptions{Level: slog.LevelDebug}))
+			result := getMap(tt.args.data, tt.args.key, lc)
+			if tt.args.wantError {
+				if !strings.Contains(out.String(), tt.args.wantText) {
+					t.Errorf("\nError message not found:\ngot: %s\nwant: %s", out.String(), tt.args.wantText)
+				}
+				if result != "" {
+					t.Errorf("\nEmpty string when error occurs, got: %v", result)
+				}
+			} else {
+				if strings.Contains(out.String(), defaultErrorText) {
+					t.Errorf("\nUnwanted error logged: %s", out.String())
+				}
+			}
+		})
+	}
+}
+
+func TestGetMapDebugLogging(t *testing.T) {
+	defaultDebugText := "Key not found"
+	type args struct {
+		data     map[string]interface{}
+		key      string
+		wantText string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"nonExistentKeyLogsDebug",
+			args{
+				map[string]interface{}{"country": "US"},
+				"city",
+				defaultDebugText,
+			}},
+		{"anotherNonExistentKey",
+			args{
+				map[string]interface{}{"ip": "8.8.8.8", "country_code": "US"},
+				"region_name",
+				defaultDebugText,
+			}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out := &bytes.Buffer{}
+			lc := slog.New(slog.NewTextHandler(out, &slog.HandlerOptions{Level: slog.LevelDebug}))
+			result := getMap(tt.args.data, tt.args.key, lc)
+			if !strings.Contains(out.String(), tt.args.wantText) {
+				t.Errorf("\nMessage not found:\ngot: %s\nwant: %s", out.String(), tt.args.wantText)
+			}
+			if result != "" {
+				t.Errorf("\nExpected empty string for missing key, got: %v", result)
 			}
 		})
 	}

@@ -109,9 +109,14 @@ func getIPDetailsFromURL(returnValues *geoInfo, ipAddress string, logger *slog.L
 }
 
 func getMap(data map[string]interface{}, key string, logger *slog.Logger) string {
-	str, ok := data[key].(string)
+	value, exists := data[key]
+	if !exists {
+		logger.Debug("Key not found", "key", key)
+		return ""
+	}
+	str, ok := value.(string)
 	if !ok {
-		logger.Error("Is not a string", "key", key, "value", str)
+		logger.Error("Is not a string", "key", key, "value", value)
 	}
 	return str
 }
