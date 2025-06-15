@@ -1,10 +1,10 @@
 package promexporter
 
 import (
+	"log/slog"
+	"os"
 	"testing"
 
-	"github.com/go-kit/log"
-	"github.com/prometheus/common/promlog"
 	"github.com/prometheus/exporter-toolkit/web"
 )
 
@@ -42,19 +42,10 @@ func TestSetExporterParams(t *testing.T) {
 	}
 }
 
-func getLogger() log.Logger {
-	var err error
-	logLevel := &promlog.AllowedLevel{}
-	err = logLevel.Set("info")
-	if err != nil {
-		panic(err)
-	}
-	promlogConfig := &promlog.Config{}
-	promlogConfig.Level = logLevel
-	if err != nil {
-		panic(err)
-	}
-	return promlog.New(promlogConfig)
+func getLogger() *slog.Logger {
+	return slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}))
 }
 
 func ptrToVal[T any](v *T) T {

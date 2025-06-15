@@ -3,7 +3,7 @@ Description=authlog_exporter
 
 [Service]
 Type=simple
-Environment="ARGS=--auth.log=/var/log/auth.log --web.endpoint=/metrics --web.listen-address=:9991"
+Environment="ARGS=--auth.log=/var/log/auth.log --web.telemetry-path=/metrics --web.listen-address=:9991"
 EnvironmentFile=-/etc/default/authlog_exporter
 ExecStart=/usr/bin/authlog_exporter $ARGS
 Restart=always

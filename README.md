@@ -93,24 +93,27 @@ usage: authlog_exporter [<flags>]
 
 
 Flags:
-  -h, --[no-]help                Show context-sensitive help (also try --help-long and --help-man).
+  -h, --[no-]help             Show context-sensitive help (also try --help-long and --help-man).
       --auth.log="/var/log/auth.log"  
-                                 Path to auth.log.
-      --web.endpoint="/metrics"  Endpoint used for metrics.
+                              Path to auth.log.
+      --web.telemetry-path="/metrics"  
+                              Path under which to expose metrics.
       --web.listen-address=:9991 ...  
-                                 Addresses on which to expose metrics and web interface. Repeatable for multiple addresses.
-      --web.config.file=""       Path to configuration file that can enable TLS or authentication. See:
-                                 https://github.com/prometheus/exporter-toolkit/blob/master/docs/web-configuration.md
-      --geo.db=""                Path to geoIP database file.
-      --geo.lang="en"            Output language format.
-      --geo.timeout=2            Timeout in seconds for waiting response from geoIP database API.
-      --geo.type=""              Type of geoIP database: db, url.
+                              Addresses on which to expose metrics and web interface. Repeatable for multiple addresses. Examples: `:9100` or
+                              `[::1]:9100` for http, `vsock://:9100` for vsock
+      --web.config.file=""    Path to configuration file that can enable TLS or authentication. See:
+                              https://github.com/prometheus/exporter-toolkit/blob/master/docs/web-configuration.md
+      --geo.db=""             Path to geoIP database file.
+      --geo.lang="en"         Output language format.
+      --geo.timeout=2         Timeout in seconds for waiting response from geoIP database API.
+      --geo.type=""           Type of geoIP database: db, url.
       --geo.url="https://reallyfreegeoip.org/json/"  
-                                 URL for geoIP database API.
-      --[no-]metric.hideip       Set this flag to hide IPs in the output and therefore drastically reduce the amount of metrics published.
-      --[no-]metric.hideuser     Set this flag to hide user accounts in the output and therefore drastically reduce the amount of metrics published.
-      --log.level=info           Only log messages with the given severity or above. One of: [debug, info, warn, error]
-      --log.format=logfmt        Output format of log messages. One of: [logfmt, json]
+                              URL for geoIP database API.
+      --[no-]metric.hideip    Set this flag to hide IPs in the output and therefore drastically reduce the amount of metrics published.
+      --[no-]metric.hideuser  Set this flag to hide user accounts in the output and therefore drastically reduce the amount of metrics published.
+      --log.level=info        Only log messages with the given severity or above. One of: [debug, info, warn, error]
+      --log.format=logfmt     Output format of log messages. One of: [logfmt, json]
+      --[no-]version          Show application version.
 ```
 
 ### geoIP

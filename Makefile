@@ -2,9 +2,16 @@ APP_NAME = authlog_exporter
 BRANCH_FULL=$(shell git rev-parse --abbrev-ref HEAD)
 BRANCH=$(subst /,-,$(BRANCH_FULL))
 GIT_REV=$(shell git describe --abbrev=7 --always)
+BUILD_DATE := $(shell date +%Y-%m-%dT%H:%M:%S%z)
+BUILD_USER ?= authlog_exporter
 SERVICE_CONF_DIR = /etc/systemd/system
 HTTP_PORT = 9991
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+LDFLAGS = -X github.com/prometheus/common/version.Version=$(BRANCH)-$(GIT_REV) \
+		  -X github.com/prometheus/common/version.Branch=$(BRANCH) \
+		  -X github.com/prometheus/common/version.Revision=$(GIT_REV) \
+		  -X github.com/prometheus/common/version.BuildDate=$(BUILD_DATE) \
+		  -X github.com/prometheus/common/version.BuildUser=$(BUILD_USER)
 
 all: run-test docker-run-test
 
@@ -17,13 +24,19 @@ test:
 build:
 	@echo "Build $(APP_NAME)"
 	@make test
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -trimpath -ldflags "-X main.version=$(BRANCH)-$(GIT_REV)" -o $(APP_NAME) $(APP_NAME).go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+		-mod=vendor -trimpath \
+		-ldflags "$(LDFLAGS)" \
+		-o $(APP_NAME) $(APP_NAME).go
 
 .PHONY: build-darwin
 build-darwin:
 	@echo "Build $(APP_NAME)"
 	@make test
-	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -mod=vendor -trimpath -ldflags "-X main.version=$(BRANCH)-$(GIT_REV)" -o $(APP_NAME) $(APP_NAME).go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build \
+		-mod=vendor -trimpath \
+		-ldflags  "$(LDFLAGS)" \
+		-o $(APP_NAME) $(APP_NAME).go
 
 .PHONY: dist
 dist:
