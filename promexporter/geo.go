@@ -40,7 +40,7 @@ func SetGeodbPath(geoType, filePath, outputLang, url string, timeout int, logger
 func checkGeoDBFlags(logger *slog.Logger) {
 	switch geodbType {
 	case "":
-		logger.Info("GeoIP database is not use")
+		logger.Info("GeoIP database is not used")
 	case "db":
 		if geodbPath == "" {
 			logger.Error("Flag geo.db is not set", "file", geodbPath)
