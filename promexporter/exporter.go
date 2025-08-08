@@ -33,7 +33,7 @@ func SetExporterParams(filePath, endpoint string, flagsConfig web.FlagConfig, hi
 	metricHideUser = hideUser
 }
 
-// Start runs promhttp endpoind and parsing log process.
+// Start runs promhttp endpoint and parsing log process.
 func Start(version string, logger *slog.Logger) {
 	go func(logger *slog.Logger) {
 		if webEndpoint == "" {

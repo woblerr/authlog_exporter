@@ -191,10 +191,8 @@ func TestGetMapErrorLogging(t *testing.T) {
 				if result != "" {
 					t.Errorf("\nEmpty string when error occurs, got: %v", result)
 				}
-			} else {
-				if strings.Contains(out.String(), defaultErrorText) {
-					t.Errorf("\nUnwanted error logged: %s", out.String())
-				}
+			} else if strings.Contains(out.String(), defaultErrorText) {
+				t.Errorf("\nUnwanted error logged: %s", out.String())
 			}
 		})
 	}
