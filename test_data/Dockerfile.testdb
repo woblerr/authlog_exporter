@@ -1,6 +1,6 @@
 ARG SCRIPT_PATH="./create_test_database.pl"
 
-FROM perl:buster as builder
+FROM perl:bookworm as builder
 ARG SCRIPT_PATH
 RUN apt-get -y update \
     && apt-get -y install \
