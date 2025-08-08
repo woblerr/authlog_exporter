@@ -1,6 +1,6 @@
 ARG REPO_BUILD_TAG="unknown"
 
-FROM golang:1.24-alpine3.20 AS builder
+FROM golang:1.24-alpine3.21 AS builder
 ARG REPO_BUILD_TAG
 WORKDIR /go/src/github.com/woblerr/authlog_exporter
 COPY . .
@@ -16,7 +16,7 @@ RUN apk update \
             -X github.com/prometheus/common/version.BuildUser=authlog_exporter" \
         -o authlog_exporter authlog_exporter.go
 
-FROM alpine:3.20
+FROM alpine:3.21
 ARG REPO_BUILD_TAG
 RUN apk add --no-cache --update ca-certificates \
     && rm -rf /var/cache/apk/*

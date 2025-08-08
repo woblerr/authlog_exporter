@@ -18,7 +18,7 @@ WORKDIR /build
 COPY --chmod=755 ${SCRIPT_PATH} /build
 RUN /build/create_test_database.pl
 
-FROM alpine:3.20
+FROM alpine:3.21
 COPY --from=builder /build/geolite2_test.mmdb /db/
 RUN ls -la /db/*
 CMD ["sleep", "150"]
