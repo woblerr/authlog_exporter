@@ -4,7 +4,8 @@ version: 2
 project_name: authlog_exporter
 
 builds:
-  - env: 
+  - id: authlog_exporter
+    env: 
       - CGO_ENABLED=0
     goos: 
       - linux
@@ -28,14 +29,14 @@ archives:
   - id: authlog_exporter
     files:
       - LICENSE
-    format: tar.gz
+    formats: [tar.gz]
     name_template: '{{ .Binary }}-{{ .Version }}-{{ if eq .Os "darwin" }}macos{{ else }}{{ .Os }}{{ end }}-{{ if eq .Arch "amd64" }}x86_64{{ else }}{{ .Arch }}{{ end }}'
     wrap_in_directory: true
 
 nfpms:
   - id: authlog_exporter
     package_name: authlog_exporter
-    builds:
+    ids:
       - authlog_exporter
     homepage: https://github.com/woblerr/authlog_exporter
     maintainer: Anton Kurochkin
