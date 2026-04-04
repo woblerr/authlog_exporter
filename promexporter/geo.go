@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"io"
 	"log/slog"
-	"net"
 	"net/http"
+	"net/netip"
 	"time"
 
-	"github.com/oschwald/geoip2-golang"
+	geoip2 "github.com/oschwald/geoip2-golang/v2"
 )
 
 var (
@@ -57,6 +57,9 @@ func checkGeoDBFlags(logger *slog.Logger) {
 }
 
 func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddress string, logger *slog.Logger) {
+	if ipAddress == "" {
+		return
+	}
 	geodb, err := geoip2.Open(geodbPath)
 	if err != nil {
 		logger.Error("Error opening GeoIp database file", "err", err)
@@ -64,9 +67,9 @@ func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddress string, logger *sl
 	}
 	defer geodb.Close()
 	logger.Debug("Parse IP", "ip", ipAddress)
-	ip := net.ParseIP(ipAddress)
-	if ip == nil {
-		logger.Error("Error parsing IP address", "ip", ipAddress)
+	ip, err := netip.ParseAddr(ipAddress)
+	if err != nil {
+		logger.Error("Error parsing IP address", "ip", ipAddress, "err", err)
 		return
 	}
 	record, err := geodb.City(ip)
@@ -74,12 +77,38 @@ func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddress string, logger *sl
 		logger.Error("Error getting location details", "err", err)
 		return
 	}
-	returnValues.countyISOCode = record.Country.IsoCode
-	returnValues.countryName = record.Country.Names[geoLang]
-	returnValues.cityName = record.City.Names[geoLang]
+	returnValues.countyISOCode = record.Country.ISOCode
+	returnValues.countryName = getNameByLang(record.Country.Names, geoLang)
+	returnValues.cityName = getNameByLang(record.City.Names, geoLang)
+}
+
+func getNameByLang(names geoip2.Names, lang string) string {
+	switch lang {
+	case "de":
+		return names.German
+	case "en":
+		return names.English
+	case "es":
+		return names.Spanish
+	case "fr":
+		return names.French
+	case "ja":
+		return names.Japanese
+	case "pt-BR":
+		return names.BrazilianPortuguese
+	case "ru":
+		return names.Russian
+	case "zh-CN":
+		return names.SimplifiedChinese
+	default:
+		return names.English
+	}
 }
 
 func getIPDetailsFromURL(returnValues *geoInfo, ipAddress string, logger *slog.Logger) {
+	if ipAddress == "" {
+		return
+	}
 	// Timeout for get and read response body.
 	client := http.Client{
 		Timeout: time.Duration(geoTimeout) * time.Second,
@@ -92,9 +121,13 @@ func getIPDetailsFromURL(returnValues *geoInfo, ipAddress string, logger *slog.L
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
-	logger.Debug("Response body", "body", string(body))
 	if err != nil {
 		logger.Error("Error getting body from GeoIp URL", "err", err)
+		return
+	}
+	logger.Debug("Response body", "body", string(body))
+	if response.StatusCode != http.StatusOK {
+		logger.Error("Unexpected status code from GeoIp URL", "status", response.StatusCode)
 		return
 	}
 	var parseData map[string]interface{}
