@@ -123,16 +123,20 @@ func getIPDetailsFromURL(returnValues *geoInfo, ipAddress string, logger *slog.L
 		return
 	}
 	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		// Read up to 512 bytes of the response body for logging purposes.
+		// This is to avoid reading large response bodies in case of errors, which could lead to performance issues.
+		errBody, _ := io.ReadAll(io.LimitReader(response.Body, 512))
+		logger.Error("Unexpected status code from GeoIp URL",
+			"status", response.StatusCode, "body", string(errBody))
+		return
+	}
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		logger.Error("Error getting body from GeoIp URL", "err", err)
 		return
 	}
 	logger.Debug("Response body", "body", string(body))
-	if response.StatusCode != http.StatusOK {
-		logger.Error("Unexpected status code from GeoIp URL", "status", response.StatusCode)
-		return
-	}
 	var parseData map[string]interface{}
 	err = json.Unmarshal(body, &parseData)
 	if err != nil {
