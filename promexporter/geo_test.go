@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	geoip2 "github.com/oschwald/geoip2-golang/v2"
 )
 
 func TestSetGeodbPath(t *testing.T) {
@@ -259,6 +261,14 @@ func TestGetIPDetailsFromURL(t *testing.T) {
 			&geoInfo{"US", "United States", ""},
 			srv.URL + "/json/",
 		},
+		{"getIPEmptyIP",
+			args{
+				&geoInfo{"", "", ""},
+				"",
+			},
+			&geoInfo{"", "", ""},
+			srv.URL + "/json/",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -308,6 +318,11 @@ func TestGetIPDetailsFromURLErrors(t *testing.T) {
 			srv.URL + "/longresponse/",
 			"Error getting GeoIp URL",
 		},
+		{"getIPBadStatusCode",
+			reqArgs,
+			srv.URL + "/badstatus/",
+			"Unexpected status code from GeoIp URL",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -327,28 +342,102 @@ func TestGetIPDetailsFromLocalDB(t *testing.T) {
 		returnValues *geoInfo
 		ipAddress    string
 	}
-	geoLang = "en"
 	tests := []struct {
 		name        string
 		args        args
 		want        *geoInfo
 		testGeoFile string
+		testGeoLang string
 	}{
-		{"getIPDetailValid",
+		{"getIPDetailValidEn",
 			args{
 				&geoInfo{"", "", ""},
 				"12.123.12.123",
 			},
 			&geoInfo{"US", "United States", ""},
 			"../test_data/geolite2_test.mmdb",
+			"en",
+		},
+		{"getIPDetailValidRu",
+			args{
+				&geoInfo{"", "", ""},
+				"12.123.12.123",
+			},
+			&geoInfo{"US", "Соединённые Штаты", ""},
+			"../test_data/geolite2_test.mmdb",
+			"ru",
+		},
+		{"getIPDetailChinaEn",
+			args{
+				&geoInfo{"", "", ""},
+				"123.123.123.123",
+			},
+			&geoInfo{"CN", "China", "Beijing"},
+			"../test_data/geolite2_test.mmdb",
+			"en",
+		},
+		{"getIPDetailChinaRu",
+			args{
+				&geoInfo{"", "", ""},
+				"123.123.123.123",
+			},
+			&geoInfo{"CN", "Китай", "Пекин"},
+			"../test_data/geolite2_test.mmdb",
+			"ru",
+		},
+		{"getIPDetailGermanyEn",
+			args{
+				&geoInfo{"", "", ""},
+				"12.123.123.1",
+			},
+			&geoInfo{"DE", "Germany", "Berlin"},
+			"../test_data/geolite2_test.mmdb",
+			"en",
+		},
+		{"getIPDetailGermanyRu",
+			args{
+				&geoInfo{"", "", ""},
+				"12.123.123.1",
+			},
+			&geoInfo{"DE", "Германия", "Берлин"},
+			"../test_data/geolite2_test.mmdb",
+			"ru",
+		},
+		{"getIPDetailUKEn",
+			args{
+				&geoInfo{"", "", ""},
+				"123.123.12.12",
+			},
+			&geoInfo{"GB", "United Kingdom", "London"},
+			"../test_data/geolite2_test.mmdb",
+			"en",
+		},
+		{"getIPDetailUKRu",
+			args{
+				&geoInfo{"", "", ""},
+				"123.123.12.12",
+			},
+			&geoInfo{"GB", "Великобритания", "Лондон"},
+			"../test_data/geolite2_test.mmdb",
+			"ru",
+		},
+		{"getIPDetailEmptyIP",
+			args{
+				&geoInfo{"", "", ""},
+				"",
+			},
+			&geoInfo{"", "", ""},
+			"../test_data/geolite2_test.mmdb",
+			"en",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			geoLang = tt.testGeoLang
 			geodbPath = getFullPath(tt.testGeoFile)
 			getIPDetailsFromLocalDB(tt.args.returnValues, tt.args.ipAddress, logger)
 			if !reflect.DeepEqual(tt.args.returnValues, tt.want) {
-				t.Errorf("\ngetIPDetailsFromURL() =\n%v,\nwant=\n%v", tt.args.returnValues, tt.want)
+				t.Errorf("\ngetIPDetailsFromLocalDB() =\n%v,\nwant=\n%v", tt.args.returnValues, tt.want)
 			}
 		})
 	}
@@ -415,6 +504,11 @@ func serverMock() *httptest.Server {
 		func(rw http.ResponseWriter, req *http.Request) {
 			time.Sleep(3 * time.Second)
 		})
+	handler.HandleFunc("/badstatus/"+testIP,
+		func(rw http.ResponseWriter, req *http.Request) {
+			rw.WriteHeader(http.StatusForbidden)
+			rw.Write([]byte(`error`))
+		})
 	srv := httptest.NewServer(handler)
 	return srv
 }
@@ -425,4 +519,85 @@ func getFullPath(relativeFilePath string) string {
 		panic(err)
 	}
 	return absPath
+}
+
+func TestGetNameByLang(t *testing.T) {
+	testNames := geoip2.Names{
+		German:              "Vereinigtes Königreich",
+		English:             "United Kingdom",
+		Spanish:             "Reino Unido",
+		French:              "Royaume-Uni",
+		Japanese:            "イギリス",
+		BrazilianPortuguese: "Reino Unido",
+		Russian:             "Великобритания",
+		SimplifiedChinese:   "英国",
+	}
+	type args struct {
+		names geoip2.Names
+		lang  string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"langDe",
+			args{testNames, "de"},
+			"Vereinigtes Königreich",
+		},
+		{"langEn",
+			args{testNames, "en"},
+			"United Kingdom",
+		},
+		{"langEs",
+			args{testNames, "es"},
+			"Reino Unido",
+		},
+		{"langFr",
+			args{testNames, "fr"},
+			"Royaume-Uni",
+		},
+		{"langJa",
+			args{testNames, "ja"},
+			"イギリス",
+		},
+		{"langPtBR",
+			args{testNames, "pt-BR"},
+			"Reino Unido",
+		},
+		{"langRu",
+			args{testNames, "ru"},
+			"Великобритания",
+		},
+		{"langZhCN",
+			args{testNames, "zh-CN"},
+			"英国",
+		},
+		{"langUnknownFallbackToEnglish",
+			args{testNames, "xx"},
+			"United Kingdom",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getNameByLang(tt.args.names, tt.args.lang); got != tt.want {
+				t.Errorf("\ngetNameByLang() =\n%v,\nwant=\n%v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetNameByLangCoversAllFields(t *testing.T) {
+	rt := reflect.TypeOf(geoip2.Names{})
+	for i := range rt.NumField() {
+		tag := rt.Field(i).Tag.Get("maxminddb")
+		if tag == "" {
+			continue
+		}
+		names := geoip2.Names{}
+		reflect.ValueOf(&names).Elem().Field(i).SetString("test")
+		if got := getNameByLang(names, tag); got != "test" {
+			t.Errorf("\nlanguage %q not handled in getNameByLang", tag)
+		}
+	}
 }
