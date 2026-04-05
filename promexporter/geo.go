@@ -82,6 +82,9 @@ func getIPDetailsFromLocalDB(returnValues *geoInfo, ipAddress string, logger *sl
 	returnValues.cityName = getNameByLang(record.City.Names, geoLang)
 }
 
+// hugeParam: intentional pass-by-value for immutability guarantee
+//
+//nolint:gocritic
 func getNameByLang(names geoip2.Names, lang string) string {
 	switch lang {
 	case "de":
